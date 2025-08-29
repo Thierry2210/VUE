@@ -1,0 +1,13 @@
+{
+    "components": [
+        "button"
+    ],
+    "minified": "false",
+    "themes": [
+        "material"
+    ],
+    "version": "19.1.58",
+    "name": "ej2",
+    "isMinified": false,
+    "injectables": {}
+}

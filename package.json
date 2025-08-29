@@ -1,0 +1,8 @@
+{
+  "name": "VUE",
+  "version": "1.0.0",
+  "dependencies": {
+    "@syncfusion/ej2-vue-charts": "^20.1.56",
+    "vue": "^3.2.34"
+  }
+}

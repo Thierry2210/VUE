@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Syncfusion Vue (ES5) UI Components</title>
+    <!-- Essentail JS2 for Vue  (All components Styles) -->
+    <link href="material.css" rel="stylesheet" type="text/css" />
+    <!-- Vue library file-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.min.js" type="text/javascript"></script>
+    <!-- Essential JS 2 for Vue  global script -->
+    <script src="ej2-vue.min.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+    <h2>Syncfusion Vue (ES5) Button Components</h2>
+    <div id="app">
+        <ejs-button is-primary="true">Button</ejs-button>
+    </div>
+    <script>
+        // Registering the Button plugin.
+        Vue.use(ejs.buttons.ButtonPlugin);
+        new Vue({
+            el: '#app',
+        });
+    </script>
+
+</body>
+
+</html>
