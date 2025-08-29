@@ -9,6 +9,14 @@ class Cadastro_Model extends Model
         parent::__construct();
     }
 
+    public function getRequestData()
+    {
+        $x = file_get_contents('php://input');
+        $x = json_decode($x, true); // array associativo
+        return $x ?? [];
+    }
+
+
     public function listaUsuario()
     {
         $sql = "SELECT * FROM fluxocaixa.usuario ORDER BY id";
@@ -23,19 +31,19 @@ class Cadastro_Model extends Model
 
     public function insertUsuario()
     {
-        $x = file_get_contents('php://input');
-        $x = json_decode($x);
-        $valorId = $x->valorId;
-        $valorNome = $x->valorNome;
-        $valorSenha = $x->valorSenha;
-        $selecionadoNivel = $x->selecionadoNivel;
+        $dados = $this->getRequestData();
+
+        $valorId = $dados['valorId'] ?? null;
+        $valorNome = $dados['valorNome'] ?? '';
+        $valorSenha = $dados['valorSenha'] ?? '';
+        $selecionadoNivel = $dados['selecionadoNivel'] ?? null;
 
         $result = $this->insert(
             "fluxocaixa.usuario",
             [
-                "id" => $valorId,
-                "nome" => $valorNome,
-                "senha" => $valorSenha,
+                "id"    => $valorId,
+                "nome"  => $valorNome,
+                "senha" => hash('sha256', $valorSenha), // Aplica SHA-256 na senha,
                 "nivel" => $selecionadoNivel,
             ]
         );
@@ -45,56 +53,89 @@ class Cadastro_Model extends Model
         } else {
             $msg = array("codigo" => 0, "texto" => "Erro ao inserir");
         }
-        echo (json_encode($msg));
+
+        echo json_encode($msg);
     }
+
 
     public function del()
     {
-        $x = file_get_contents('php://input');
-        $x = json_decode($x);
-        $valorID = (int)($x->id ?? 0);
+        $dados = $this->getRequestData();
+        $id = (int)($dados['id'] ?? 0);
+
         $msg = array("codigo" => 0, "texto" => "Erro ao excluir.");
-        if ($valorID > 0) {
-            $result = $this->delete("fluxocaixa.usuario", "id='$valorID'");
+
+        if ($id > 0) {
+            $result = $this->delete("fluxocaixa.usuario", "id='$id'");
             if ($result) {
                 $msg = array("codigo" => 1, "texto" => "Registro exluído com sucesso.");
             }
         }
+
         echo json_encode($msg);
     }
 
-    public function loadData($id)
+    public function loadData()
     {
-        $id = (int)$id;
-        $result = $this->select("select * from fluxocaixo.usuario where id=:id", ["id" => $id]);
-        $result = json_encode($result);
-        echo ($result);
+        $dados = $this->getRequestData(); // função helper que criamos
+        $id = (int)($dados['id'] ?? 0);
+
+        $result = [];
+
+        $msg = array("codigo" => 0, "texto" => "Erro ao excluir.");
+
+        if ($id > 0) {
+            $result = $this->select(
+                "SELECT * FROM fluxocaixa.usuario WHERE id=:id",
+                ["id" => $id]
+            );
+            if ($result) {
+                $msg = array("codigo" => 1, "texto" => "Registro exluído com sucesso.");
+            }
+        }
+
+        echo json_encode($msg);
     }
+
 
     public function save()
     {
-        $x = file_get_contents('php://input');
-        $x = json_decode($x);
-        $valorId = $x->valorId ?? null;
-        $valorNome = $x->valorNome;
-        $valorSenha = $x->valorSenha;
-        $selecionadoNivel = $x->selecionadoNivel;
+        $dados = $this->getRequestData();
+
+        $valorId = $dados['valorId'] ?? null;
+        $valorNome = $dados['valorNome'] ?? '';
+        $valorSenha = $dados['valorSenha'] ?? '';
+        $selecionadoNivel = $dados['selecionadoNivel'] ?? null;
+
         $msg = array("codigo" => 0, "texto" => "Erro ao atualizar.");
+
         if ($valorId > 0) {
-            $dadosSave = array("id" => $valorId, "nome" => $valorNome, "senha" => $valorSenha, "nivel" => $selecionadoNivel);
-            $result = $this->update("fluxocaixo.usuario", $dadosSave, "id='$valorId'");
+            $dadosSave = array(
+                "nome" => $valorNome,
+                "senha" => $valorSenha,
+                "nivel" => $selecionadoNivel
+            );
+
+            $result = $this->update("fluxocaixa.usuario", $dadosSave, "id='$valorId'");
+
             if ($result) {
                 $msg = array("codigo" => 1, "texto" => "Registro atualizado com sucesso.");
             }
         }
+
         echo (json_encode($msg));
     }
 
 
     public function selectNivelUsuario()
     {
-        $result = $this->select("select codigo,descricao from fluxocaixa.nivelusuario order by descricao");
+        $result = $this->select("
+        select codigo,descricao 
+        from fluxocaixa.nivelusuario 
+        order by descricao");
+
         $result = json_encode($result);
+
         echo ($result);
     }
 }

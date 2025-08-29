@@ -19,39 +19,4 @@ class Index extends Controller
         $this->view->render('header');
         $this->view->render('footer');
     }
-
-    function addLancamento()
-    {
-        $this->model->insertLancamento();
-    }
-
-    function listaLancamento()
-    {
-        $this->model->listaLancamento();
-    }
-
-    function del()
-    {
-        $this->model->del();
-    }
-
-    function loadData($id)
-    {
-        $this->model->loadData($id);
-    }
-
-    function save()
-    {
-        $this->model->save();
-    }
-
-    function selectLancamento()
-    {
-        $this->model->selectLancamento();
-    }
-
-    function selectFluxo()
-    {
-        $this->model->selectFluxo();
-    }
 }

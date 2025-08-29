@@ -93,9 +93,21 @@
                                     <a href="<?= URL ?>cadastro" class="nav__dropdown-item">Cadastro de Usuários</a>
                                 </div>
                             </div>
+
+                            <div class="nav__dropdown-collapse" v-if="!isLogged">
+                                <div class="nav__dropdown-content">
+                                    <a href="<?= URL ?>login" class="nav__dropdown-item">Login</a>
+                                </div>
+                            </div>
+
+                            <div class="nav__dropdown-collapse">
+                                <div class="nav__dropdown-content">
+                                    <a href="<?= URL ?>lancamento" class="nav__dropdown-item">Lançamentos</a>
+                                </div>
+                            </div>
                         </div>
 
-                        <a href="#" class="nav__link">
+                        <!-- <a href="#" class="nav__link">
                             <i class='bx bx-message-rounded nav__icon'></i>
                             <span class="nav__name">Mensagens</span>
                         </a>
@@ -139,30 +151,45 @@
                         </a>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
-            <a href="#" class="nav__link nav__logout">
-                <i class='bx bx-log-out nav__icon'></i>
-                <span class="nav__name">Sair</span>
-            </a>
+                        <a href="#" class="nav__link nav__logout" v-if="isLogged" @click="logout">
+                            <i class='bx bx-log-out nav__icon'></i>
+                            <span class="nav__name">Sair</span>
+                        </a>
         </nav>
     </div>
 
-    <div id="mainLayout"></div>
+    <div id="mainLayout">
+        <AppVue></AppVue>
+    </div>
 
     <script>
+        // Passa o estado do usuário logado via PHP para o JS
+        const userFromStorage = localStorage.getItem("usuario");
+        const usuario = userFromStorage ? JSON.parse(userFromStorage) : null;
+
+        new Vue({
+            el: '#appNav',
+            data: {
+                isLogged: !!usuario,
+                usuario: usuario
+            },
+            methods: {
+                logout() {
+                    localStorage.removeItem("usuario");
+                    this.isLogged = false;
+                    this.usuario = null;
+                    // Redireciona para a página de login ou home
+                    window.location.href = "<?= URL ?>login";
+                }
+            }
+        })
+
         const mainLayout = new Vue({
             el: '#mainLayout',
-            template: `
-            <div>
-                <AppVue></AppVue>
-            </div>
-        `,
-            data: function() {
-                return {}
-            },
-            methods: {}
-        })
+            template: `<AppVue></AppVue>`,
+        });
     </script>
 
 </body>

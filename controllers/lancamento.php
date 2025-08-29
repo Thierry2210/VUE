@@ -1,6 +1,6 @@
 <?php
 
-class Cadastro extends Controller
+class Lancamento extends Controller
 {
 
     function __construct()
@@ -14,20 +14,20 @@ class Cadastro extends Controller
     {
         $this->view->title = "Home";
         /*Os array push devem ser feitos antes de instanciar o header e footer.*/
-        array_push($this->view->js, "views/cadastro/app.vue.js");
-        array_push($this->view->css, "views/cadastro/app.vue.css");
+        array_push($this->view->js, "views/lancamento/app.vue.js");
+        array_push($this->view->css, "views/lancamento/app.vue.css");
         $this->view->render('header');
         $this->view->render('footer');
     }
 
-    function addUsuario()
+    function addLancamento()
     {
-        $this->model->insertUsuario();
+        $this->model->insertLancamento();
     }
 
-    function listaUsuario()
+    function listaLancamento()
     {
-        $this->model->listaUsuario();
+        $this->model->listaLancamento();
     }
 
     function del()
@@ -40,14 +40,18 @@ class Cadastro extends Controller
         $this->model->loadData();
     }
 
-
     function save()
     {
         $this->model->save();
     }
 
-    function selectNivelUsuario()
+    function selectLancamento()
     {
-        $this->model->selectNivelUsuario();
+        $this->model->selectLancamento();
+    }
+
+    function selectFluxo()
+    {
+        $this->model->selectFluxo();
     }
 }

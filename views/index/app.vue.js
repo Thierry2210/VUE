@@ -1,241 +1,171 @@
-const AppTemplate = /*html*/ `
-
-<div class="control-section" style="margin-top: 5%">
+const AppTemplate = `
+<div class="col-md-12 control-section card-control-section basic_card_layout">
+  <div class="e-card-resize-container" style="margin-bottom: 90px">
     <div class="row">
-        <div class="col-md-1">
-            <ejs-textbox ref="sequencia" cssClass="e-outline" floatLabelType="Auto" v-model="valorSequencia" type="hidden"></ejs-textbox>
+      <div class="col-md-12 card-layout" style="padding: 0 !important;">
+        <div tabindex="0" class="e-card" id="basic_card">
+          <div class="e-card-content">
+            <ejs-grid 
+              ref='grid' 
+              :dataSource='itens' 
+              height='600px' 
+              :toolbarClick="toolbarClick"
+              :toolbar='[
+              "Search",
+              {
+                  text: "Novo",
+                  toolGrupoText: "Novo",
+                  prefixIcon: "fas fa-plus",
+                  id: "novo"
+              },
+              {
+                  text: "Editar",
+                  toolGrupoText: "Editar",
+                  prefixIcon: "fas fa-edit",
+                  id: "editar"
+              },
+              {
+                  text: "Excluir",
+                  toolGrupoText: "Excluir",
+                  prefixIcon: "fas fa-trash-alt",
+                  id: "excluir"
+              },
+              ]'>
+              <e-columns>
+              <e-column field='CAMPO1' headerText='Campo 1' width="20%"></e-column>
+              <e-column field='CAMPO2' headerText='Campo 2' width="30%"></e-column>
+              <e-column field='CAMPO3' headerText='Campo 3' width="30%"></e-column>
+              <e-column field="CAMPO4" headerText="Campo 4" width="20%"></e-column> 
+              </e-columns>
+            </ejs-grid>
+          </div>
         </div>
-        <div class="row" style="display: flex;justify-content: center;">
-           <div class="col-md-2">
-                <ejs-datepicker ref="data" cssClass="e-outline" floatLabelType="Auto" v-model="valorData" placeholder="Selecione uma data" format="yyyy-MM-dd"></ejs-datepicker>
-            </div>
-            <div class="col-md-3">
-                <ejs-dropdownlist
-                    id="dropdownLancamento"
-                    cssClass="e-outline"
-                    floatLabelType="Auto"
-                    :dataSource="opcoesLancamento"
-                    v-model="selecionadoLancamento"
-                    placeholder="Selecione um lançamento"
-                    :fields="campos">
-                </ejs-dropdownlist>
-            </div>
-            <div class="col-md-2">
-                <ejs-maskedtextbox ref="valor" cssClass="e-outline" floatLabelType="Auto" placeholder="Digite um valor" :format="'n2'":decimals="2" v-model="valor"></ejs-maskedtextbox>
-            </div>
-            <div class="col-md-2">
-                <ejs-dropdownlist
-                    id="dropdownFluxo"
-                    cssClass="e-outline"
-                    floatLabelType="Auto"
-                    :dataSource="opcoesFluxo"
-                    v-model="selecionadoFluxo"
-                    placeholder="Selecione um fluxo"
-                    :fields="campos">
-                </ejs-dropdownlist>
-            </div>
-        </div>
-        <div class="row" style="margin-top: 20px; display: flex;justify-content: center;">
-            <div class="col-md-4" style="display: flex;justify-content: center;">
-                <ejs-textbox cssClass="e-outline" placeholder="Observações" v-model="obs"></ejs-textbox>
-            </div>
-        </div>
-        <div class="row" style="margin-top: 20px; display: flex;justify-content: center;">
-            <div class="col-md-4" style="display: flex;justify-content: center;  gap:20px">
-                <ejs-button v-on:click.native="reqLanca" cssClass="e-outline">Lançar</ejs-button>
-                <ejs-button v-on:click.native="reqLista" cssClass="e-outline">Chamar Infos</ejs-button>
-            </div>
-        </div>
-        <div class="row" style="margin-top: 20px;">
-            <div class="col-md-12">
-                <ejs-grid 
-                    ref="grid"
-                    :dataSource="dataSource"
-                    height="600px"
-                    :allowPaging="true"
-                    :allowSorting="true"
-                    :toolbarClick="toolbarClick"
-                    :toolbar='[
-                        "Search",
-                        {
-                            text: "Editar",
-                            toolGrupoText: "Editar",
-                            prefixIcon: "fas fa-edit",
-                            id: "editar"
-                        },
-                        {
-                            text: "Excluir",
-                            toolGrupoText: "Excluir",
-                            prefixIcon: "fas fa-trash",
-                            id: "excluir"
-                        }
-                    ]'
-                    :pageSettings="{ pageSizes: true, pageSize: 12 }"
-                    :searchSettings="{ ignoreCase: true, ignoreAccent: true }">
-
-                    <e-columns>
-                        <e-column field="sequencia" headerText="Sequência"></e-column>
-                        <e-column field="data" headerText="Data"></e-column>
-                        <e-column field="tipo" headerText="Tipo"></e-column>
-                        <e-column field="valor" headerText="Valor"></e-column>
-                        <e-column field="fluxo" headerText="Fluxo"></e-column>
-                        <e-column field="obs" headerText="Observação"></e-column>
-                    </e-columns>
-                </ejs-grid>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
+  <ejs-dialog 
+    isModal='true'
+    :header="modalHeader"
+    :buttons="modalButtons"
+    :open="(args) => {args.preventFocus = true;} /*tirar o foco do botão primário do modal*/"
+    ref="modal" 
+    v-bind:visible="false" 
+    :animationSettings="{ effect: 'None' }" 
+    :showCloseIcon='false' 
+    :closeOnEscape="false"
+    target='body'
+    width='1000px'>
+    <div class="row">
+      <div class="col-md-6 margin-input">
+        <ejs-textbox
+          floatLabelType="Auto"
+          cssClass='e-outline'
+          placeholder='Campo 1'
+          ref="campo1"
+          v-model="infoManipulando.campo1">
+        </ejs-textbox>
+        <span class="error-input-msg"></span>
+      </div>
+      <div class="col-md-6 margin-input">
+        <ejs-textbox
+          floatLabelType="Auto"
+          cssClass="e-outline"
+          placeholder='Campo 2'
+          ref="campo2"
+          v-model="infoManipulando.campo2">
+        </ejs-textbox>
+        <span class="error-input-msg"></span>
+      </div>
+      <div class="col-md-6 margin-input">
+        <ejs-textbox
+          floatLabelType="Auto"
+          cssClass="e-outline"
+          placeholder='Campo 3'
+          maxlength="50"
+          ref="campo3"
+          v-model="infoManipulando.campo3">
+        </ejs-textbox>
+        <span class="error-input-msg"></span>
+      </div>
+      <div class="col-md-6 margin-input">
+        <ejs-textbox
+          floatLabelType="Auto"
+          cssClass="e-outline"
+          placeholder='Campo 4'
+          maxlength="50"
+          ref="campo4"
+          v-model="infoManipulando.campo4">
+        </ejs-textbox>
+        <span class="error-input-msg"></span>
+      </div>
+    </div>
+  </ejs-dialog>
 </div>
-
 `;
 
-Vue.component('AppVue', {
+Vue.component("AppVue", {
     template: AppTemplate,
-    data: function () {
+    data() {
         return {
-            valorSequencia: null,
-            valorTexto: "",
-            dataSource: [],
-            dropdown: null,
-            valorData: null,
-            selecionadoLancamento: null,
-            opcoesLancamento: [],
-            campos: { value: 'id', text: 'texto' },
-            valor: 0,
-            selecionadoFluxo: null,
-            opcoesFluxo: [],
-            obs: "",
-            listaItens: [],
+            itens: [],
+            acaoAtual: null,
+            infoManipulando: null,
         }
     },
-    mounted: function () {
-        this.reqLista();
-        this.reqLanca();
-        this.selectLancamento();
-        this.selectFluxo();
-    },
     methods: {
-        toBRDate(isoDateTime) {
-            if (!isoDateTime) return '';
-            // evita problemas de timezone e do new Date em navegadores
-            const [date] = String(isoDateTime).split(' ');
-            const [yyyy, mm, dd] = date.split('-');
-            return `${dd}/${mm}/${yyyy}`;
-        },
-
-        // Formata número para BRL
-        toMoney(v) {
-            const n = Number(v);
-            if (Number.isNaN(n)) return '';
-            return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        },
-
-        // Busca o texto pelo id (tipo/fluxo)
-        lookupText(list, id) {
-            const num = Number(id);
-            const found = list.find(x => x.id === num);
-            return found ? found.texto : String(id);
-        },
-
-        // Converte e cria campos prontos para o Grid
-        normalizeRows(rows) {
-            return rows.map(r => {
-                const tipo = Number(r.tipo);
-                const fluxo = Number(r.fluxo);
-                const valor = Number(r.valor);
-                return {
-                    ...r,
-                    tipo, fluxo, valor,
-                    data: this.toBRDate(r.data),
-                    valor: this.toMoney(valor),
-                    tipo: this.lookupText(this.opcoesLancamento, tipo),
-                    fluxo: this.lookupText(this.opcoesFluxo, fluxo),
-                };
-            });
-        },
-
-        payload() {
-            return {
-                valorData: this.valorData,
-                selecionadoLancamento: this.selecionadoLancamento,
-                valor: this.$refs.valor?.value || 0,
-                selecionadoFluxo: this.selecionadoFluxo,
-                obs: this.obs,
-
-            };
-        },
-        // Chama o backend e preenche o Grid
-        reqLista() {
-            const data = this.payload();
-            axios.post(BASE + "/index/listaLancamento", data)
-                .then(res => {
-                    if (res.data && res.data.codigo === 1 && Array.isArray(res.data.dados)) {
-                        this.dataSource = this.normalizeRows(res.data.dados);
+        getItens() {
+            axios.post(BASE + "/controller/getItens")
+                .then(resp => {
+                    if (resp.data.code == 1) {
+                        //sucesso
+                        this.itens = res.data.itens;
+                    } else if (resp.data.code == 0) {
+                        //erro tratado
+                        mainLayout.sToast('Atenção!', resp.data.msg, 'warning');
                     } else {
-                        alert(res.data?.texto || "Erro ao carregar dados.");
+                        //erro não tratado
+                        mainLayout.sToast('Não foi possível concluir a ação.', resp.data);
                     }
-                })
-                .catch(() => {
-                    alert("Erro ao conectar com o servidor.");
                 });
         },
-
-        reqLanca() {
-            console.log(this.payload());
-            const data = this.payload();
-            axios.post(BASE + "/index/addLancamento", data).then(res => {
-                if (res.data.codigo === 1) {
-                    alert(res.data.texto);
-                } else {
-                    alert(res.data?.texto || "Erro ao carregar dados.");
-                }
-            }).catch(() => {
-                alert("Erro ao conectar com o servidor.");
-            })
+        getItem() {
+            axios.post(BASE + "/controller/getItem", dadosRequisicao)
+                .then(resp => {
+                    if (resp.data.code == 1) {
+                        //sucesso
+                        this.infoManipulando = res.data.itens;
+                    } else if (resp.data.code == 0) {
+                        //erro tratado
+                        mainLayout.sToast('Atenção!', resp.data.msg, 'warning');
+                    } else {
+                        //erro não tratado
+                        mainLayout.sToast('Não foi possível concluir a ação.', resp.data);
+                    }
+                });
         },
-
-        selectLancamento() {
-            axios.post(BASE + "/index/selectLancamento").then(res => {
-                if (res && Array.isArray(res.data)) {
-                    this.opcoesLancamento = res.data.map(item => ({
-                        id: item.sequencia,    // Usando sequencia como 'id'
-                        texto: item.descricao  // Usando descricao como 'texto'
-                    }));
-                } else {
-                    alert("Erro ao carregar as opções de lançamento.");
-                }
-            })
-                .catch(() => {
-                    alert("Erro ao conectar com o servidor.");
-                })
-        },
-
-        selectFluxo() {
-            axios.post(BASE + "/index/selectFluxo").then(res => {
-                if (res && Array.isArray(res.data)) {
-                    this.opcoesFluxo = res.data.map(item => ({
-                        id: item.codigo,    // Usando sequencia como 'id'
-                        texto: item.descricao  // Usando descricao como 'texto'
-                    }));
-                } else {
-                    alert("Erro ao carregar as opções de lançamento.");
-                }
-            })
-                .catch(() => {
-                    alert("Erro ao conectar com o servidor.");
-                })
-        },
-
         toolbarClick(args) {
+            this.acaoAtual = args.item.id;
+            this.infoManipulando = null;
+
             const itemSelecionado = this.$refs.grid.getSelectedRecords();
 
-            if (args.item.id == 'editar') {
-                if (itemSelecionado.length > 0) {
+            if (this.acaoAtual == 'novo') {
+                this.modalHeader = 'Novo';
+                this.modalButtons = [{ click: this.gravarModal, buttonModel: { content: 'Salvar', isPrimary: true } }, { click: this.fecharModal, buttonModel: { content: 'Fechar' } }];
 
+                this.getItem();
+                this.abrirModal();
+            } else if (this.acaoAtual == 'editar') {
+                if (itemSelecionado.length > 0) {
+                    this.modalHeader = 'Editar';
+                    this.modalButtons = [{ click: this.gravarModal, buttonModel: { content: 'Salvar', isPrimary: true } }, { click: this.fecharModal, buttonModel: { content: 'Fechar' } }];
+
+                    this.getItem();
+                    this.abrirModal();
                 } else {
                     mainLayout.sToast('Por favor, selecione um registro.', '', 'warning');
                 }
-            } else if (args.item.id == 'excluir') {
+            } else if (this.acaoAtual == 'excluir') {
                 if (itemSelecionado.length > 0) {
                     dialogConfirm({
                         msg: 'Tem certeza que deseja excluir esse item?',
@@ -263,10 +193,28 @@ Vue.component('AppVue', {
                 }
             }
         },
+        abrirModal() {
+            this.$refs.modal.show();
+        },
+        fecharModal() {
+            this.$refs.modal.hide();
+        },
+        gravarModal() {
+            this.$refs.infoGerais.gravarModal();
+        },
+        limparInfoManipulando() {
+            this.infoManipulando = {
+                CAMPO1: null,
+                CAMPO2: null,
+                CAMPO3: null,
+                CAMPO3: null
+            }
+        },
     },
-    watch: {
-        'valorTexto': function (args) {
-            console.log(args);
-        }
-    }
-})
+    mounted: function () {
+        this.getDados();
+    },
+    watch: {},
+});
+
+

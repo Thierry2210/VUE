@@ -95,7 +95,6 @@ Vue.component('AppVue', {
     },
     mounted: function () {
         this.reqLista();
-        this.reqLanca();
         this.selectNivelUsuario();
     },
     methods: {
@@ -104,7 +103,6 @@ Vue.component('AppVue', {
             this.valorNome = "";
             this.valorSenha = "";
             this.selecionadoNivel = null;
-            this.dataSource = []; // opcional: limpa a grid também
         },
 
         payload() {
@@ -148,85 +146,86 @@ Vue.component('AppVue', {
                 .catch(() => {
                     alert("Erro ao cadastrar.");
                 });
-        }
-    },
+        },
 
-    reqCancel() {
-        this.resetForm();
-        this.isEditing = false;
-    },
+        reqCancel() {
+            this.resetForm();
+            this.isEditing = false;
+        },
 
-    reqSave() {
-        const data = this.payload();
-        axios.post(BASE + "/cadastro/save", data)
-            .then(() => {
-                this.reqLista();
-                this.resetForm();
-                this.isEditing = false;
-            });
-    },
+        reqSave() {
+            const data = this.payload();
+            axios.post(BASE + "/cadastro/save", data)
+                .then(() => {
+                    this.reqLista();
+                    this.resetForm();
+                    this.isEditing = false;
+                });
+        },
 
-    selectNivelUsuario() {
-        axios.post(BASE + "/cadastro/selectNivelUsuario").then(res => {
-            if (res && Array.isArray(res.data)) {
-                this.opcoesNivel = res.data.map(item => ({
-                    id: item.codigo,    // Usando sequencia como 'id'
-                    texto: item.descricao  // Usando descricao como 'texto'
-                }));
-            } else {
-                alert("Erro ao carregar as opções de lançamento.");
-            }
-        })
-            .catch(() => {
-                alert("Erro ao conectar com o servidor.");
+        selectNivelUsuario() {
+            axios.post(BASE + "/cadastro/selectNivelUsuario").then(res => {
+                if (res && Array.isArray(res.data)) {
+                    this.opcoesNivel = res.data.map(item => ({
+                        id: item.codigo,    // Usando sequencia como 'id'
+                        texto: item.descricao  // Usando descricao como 'texto'
+                    }));
+                } else {
+                    alert("Erro ao carregar as opções de lançamento.");
+                }
             })
-    },
+                .catch(() => {
+                    alert("Erro ao conectar com o servidor.");
+                })
+        },
 
-    toolbarClick(id) {
-        const itemSelecionado = this.$refs.grid.getSelectedRecords();
-        if (id.item.id == 'editar') {
-            if (itemSelecionado.length > 0) {
-                const usuario = itemSelecionado[0]; // pega o primeiro selecionado
-                axios.post(BASE + "/cadastro/loadData", { id: usuario.id })
-                    .then(resp => {
-                        const dados = resp.data[0]; // seu loadData retorna array
-                        this.valorId = dados.id;
-                        this.valorNome = dados.nome;
-                        this.valorSenha = dados.senha;
-                        this.selecionadoNivel = dados.nivel;
-                        this.btnEdit = true;
-                    })
-                    .catch(() => {
-                        alert("Erro ao carregar dados para edição.");
-                    });
-            } else {
-                alert('Por favor, selecione um registro.', '', 'warning');
-            }
-        } else if (id.item.id == 'excluir') {
+        toolbarClick(id) {
             const itemSelecionado = this.$refs.grid.getSelectedRecords();
 
-            if (confirm("Tem certeza que deseja excluir esse item?")) {
-                const usuario = itemSelecionado[0];
-                var params = { id: usuario.id };
-                axios.post(BASE + "/cadastro/del", params)
-                    .then(resp => {
-                        if (resp.data.codigo == 1) {
-                            alert(resp.data.texto, 'success');
-                            this.reqLista();
-                        } else {
-                            alert(resp.data.texto, 'warning');
-                        }
-                    })
-                    .catch(() => {
-                        alert("Erro ao conectar com o servidor.");
-                    });
+            if (id.item.id == 'editar') {
+                if (itemSelecionado.length > 0) {
+                    const usuario = itemSelecionado[0]; // pega o primeiro selecionado
+                    axios.post(BASE + "/cadastro/loadData", { id: usuario.id })
+                        .then(res => {
+                            const dados = res.data[0]; // seu loadData retorna array
+                            this.valorId = dados.id;
+                            this.valorNome = dados.nome;
+                            this.valorSenha = dados.senha;
+                            this.selecionadoNivel = dados.nivel;
+                            this.btnEdit = true;
+                            alert(res.data.texto, 'success');
+                        })
+                        .catch(() => {
+                            alert("Erro ao carregar dados para edição.");
+                        });
+                } else {
+                    alert('Por favor, selecione um registro.', '', 'warning');
+                }
+            } else if (id.item.id == 'excluir') {
+                const itemSelecionado = this.$refs.grid.getSelectedRecords();
+
+                if (confirm("Tem certeza que deseja excluir esse item?")) {
+                    const usuario = itemSelecionado[0];
+                    var params = { id: usuario.id };
+                    axios.post(BASE + "/cadastro/del", params)
+                        .then(res => {
+                            if (res.data.codigo == 1) {
+                                alert(res.data.texto, 'success');
+                                this.reqLista();
+                            } else {
+                                alert(resp.data.texto, 'warning');
+                            }
+                        })
+                        .catch(() => {
+                            alert("Erro ao conectar com o servidor.");
+                        });
+                }
             }
-        }
+        },
     },
-},
     watch: {
-    'valorTexto': function (args) {
-        console.log(args);
+        'valorTexto': function (args) {
+            console.log(args);
+        }
     }
-}
 })
