@@ -14,33 +14,25 @@ const AppTemplate = /*html*/`
         </div>
         <div class="row" style="margin-top: 20px; display: flex; justify-content: center;">
             <div class="col-md-6">
-                <ejs-button v-on:click.native="reqLogin" cssClass="e-outline" style="width: 100%;">Fazer login</ejs-button>
+                <ejs-button v-on:click.native="reqLogin" style="width: 100%;" class="btn btn-primary">Fazer login</ejs-button>
             </div>
         </div>
     </div>
 </div>
-
-
-
 `;
 
 Vue.component('AppVue', {
     template: AppTemplate,
-    // Aqui você define o "template"(HTML) que o Vue vai renderizar.
-    // No seu caso, o template vem da constante AppTemplate que você criou antes.
 
     data: function () {
         return {
-            valorId: '',     // campo ligado ao input do ID(v - model="valorId")
-            valorSenha: '',  // campo ligado ao input da senha(v- model="valorSenha")
-            usuario: null,   // aqui ficará armazenado o objeto retornado do backend
-            isLogged: false  // flag pra saber se o usuário já está logado
+            valorId: '',
+            valorSenha: '',
         }
     },
 
     mounted: function () {
-        // Esse método roda quando o componente é "montado" na tela.
-        // Dá pra inicializar dados aqui, mas no momento não se usa nada.
+
     },
 
     methods: {
@@ -48,19 +40,18 @@ Vue.component('AppVue', {
             // Esse método é chamado quando o usuário clica no botão de login.
 
             axios.post(BASE + "/login/autenticar", {
-                usuario: this.valorId,  // pega o valor digitado no campo de ID
-                senha: this.valorSenha  // pega o valor digitado no campo de senha
+                usuario: this.valorId,
+                senha: this.valorSenha
             }).then(res => {
                 // Se a requisição deu certo, cai aqui
 
-                if (res.data.codigo === 1) {
-                    // Se o backend retornou sucesso(codigo = 1):
-                    this.usuario = res.data.usuario;  // guarda o usuário logado
-                    this.isLogged = true;             // marca que o login foi feito
+                if (res.data.codigo && res.data.codigo === 1) {
+                    // salva no localStorage para o frontend (menu, etc.)
+                    localStorage.setItem('usuario', JSON.stringify(res.data.usuario));
 
-                    // Teste de saída no console:
-                    console.log("Nome:", this.usuario.nome);
-                    console.log("Nível:", this.usuario.nivel);
+                    // redireciona para home ou onde quiser
+                    window.location.href = BASE;
+                    alert("Login realizado com sucesso!");
                 } else {
                     // Se o backend retornou erro, mostra alerta
                     alert(res.data.texto);

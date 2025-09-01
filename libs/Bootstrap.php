@@ -98,9 +98,6 @@ class Bootstrap
     }
 
     /**
-    
-    
-    /**
      * Carrega um controller existente passado no $_GET
      * 
      * @return boolean|string

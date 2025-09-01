@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 require_once("util/param.php");
 
 class Cadastro_Model extends Model

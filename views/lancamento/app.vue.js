@@ -1,59 +1,78 @@
 const AppTemplate = /*html*/ `
-
 <div class="control-section" style="margin-top: 5%">
     <div class="row">
-        <div class="col-md-1">
-            <ejs-textbox ref="sequencia" cssClass="e-outline" floatLabelType="Auto" v-model="valorSequencia" type="hidden"></ejs-textbox>
-        </div>
-        <div class="row" style="display: flex;justify-content: center;">
-           <div class="col-md-2">
-                <ejs-datepicker ref="data" cssClass="e-outline" floatLabelType="Auto" v-model="valorData" placeholder="Selecione uma data" format="yyyy-MM-dd"></ejs-datepicker>
+        <!-- Campo sequencia oculto (usado para edição) -->
+        <ejs-textbox ref="sequencia" v-model="valorSequencia" type="hidden" cssClass="e-outline"></ejs-textbox>
+
+        <!-- Linha de inputs principais -->
+        <div class="row" style="display: flex; justify-content: center;">
+            <!-- Data -->
+            <div class="col-md-2">
+                <ejs-datepicker
+                    cssClass="e-outline" 
+                    ref="data"
+                    v-model="valorData" 
+                    placeholder="Selecione uma data" 
+                    format="yyyy-MM-dd">
+                </ejs-datepicker>
             </div>
+
+            <!-- Lançamento -->
             <div class="col-md-2">
                 <ejs-dropdownlist
-                    id="dropdownLancamento"
                     cssClass="e-outline"
-                    floatLabelType="Auto"
                     :dataSource="opcoesLancamento"
                     v-model="selecionadoLancamento"
-                    placeholder="Selecione um lançamento"
-                    :fields="campos">
+                    :fields="campos"
+                    placeholder="Selecione um lançamento">
                 </ejs-dropdownlist>
             </div>
+
+            <!-- Valor -->
             <div class="col-md-2">
-                <ejs-maskedtextbox ref="valor" cssClass="e-outline" floatLabelType="Auto" placeholder="Digite um valor" :format="'n2'":decimals="2" v-model="valor"></ejs-maskedtextbox>
+                <ejs-maskedtextbox 
+                    cssClass="e-outline"
+                    v-model="valor"
+                    placeholder="Digite um valor"
+                    :format="'n2'"
+                    :decimals="2">
+                </ejs-maskedtextbox>
             </div>
+
+            <!-- Fluxo -->
             <div class="col-md-2">
                 <ejs-dropdownlist
-                    id="dropdownFluxo"
                     cssClass="e-outline"
-                    floatLabelType="Auto"
                     :dataSource="opcoesFluxo"
                     v-model="selecionadoFluxo"
-                    placeholder="Selecione um fluxo"
-                    :fields="campos">
+                    :fields="campos"
+                    placeholder="Selecione um fluxo">
                 </ejs-dropdownlist>
             </div>
         </div>
-        <div class="row" style="margin-top: 20px; display: flex;justify-content: center;">
-            <div class="col-md-4" style="display: flex;justify-content: center;">
-                <ejs-textbox cssClass="e-outline" placeholder="Observações" v-model="obs"></ejs-textbox>
+
+        <!-- Observações -->
+        <div class="row" style="margin-top: 20px; justify-content: center;">
+            <div class="col-md-4">
+                <ejs-textbox v-model="obs" placeholder="Observações" cssClass="e-outline"></ejs-textbox>
             </div>
         </div>
-        <div class="row" style="margin-top: 20px; display: flex;justify-content: center;">
-            <div class="col-md-4" style="display: flex;justify-content: center;  gap:20px">
-                <div v-if="!btnEdit">
-                    <ejs-button v-on:click.native="reqLanca" cssClass="e-outline">Cadastrar</ejs-button>
+
+        <!-- Botões -->
+        <div class="row" style="margin-top: 20px; justify-content: center;">
+            <div class="col-md-4" style="display: flex; justify-content: center; gap: 20px;">
+                <div v-if="!isEditing">
+                    <ejs-button @click.native="reqLanca" cssClass="e-primary">Cadastrar</ejs-button>
+                    <ejs-button @click.native="reqLista">Chamar Infos</ejs-button>
                 </div>
-                <div v-if="btnEdit">
-                    <ejs-button v-on:click.native="reqSave" cssClass="e-outline">Salvar</ejs-button>
-                    <ejs-button v-on:click.native="reqCancel" cssClass="e-outline">Cancelar</ejs-button>
-                </div>
-                <div v-if="!btnEdit">
-                    <ejs-button v-on:click.native="reqLista" cssClass="e-outline">Chamar Infos</ejs-button>
+                <div v-else>
+                    <ejs-button @click.native="reqSave" class="btn btn-primary">Salvar</ejs-button>
+                    <ejs-button @click.native="reqCancel">Cancelar</ejs-button>
                 </div>
             </div>
         </div>
+
+        <!-- Grid -->
         <div class="row" style="margin-top: 20px;">
             <div class="col-md-12">
                 <ejs-grid 
@@ -62,22 +81,8 @@ const AppTemplate = /*html*/ `
                     height="600px"
                     :allowPaging="true"
                     :allowSorting="true"
+                    :toolbar="toolbar"
                     :toolbarClick="toolbarClick"
-                    :toolbar='[
-                        "Search",
-                        {
-                            text: "Editar",
-                            toolGrupoText: "Editar",
-                            prefixIcon: "fas fa-edit",
-                            id: "editar"
-                        },
-                        {
-                            text: "Excluir",
-                            toolGrupoText: "Excluir",
-                            prefixIcon: "fas fa-trash",
-                            id: "excluir"
-                        }
-                    ]'
                     :pageSettings="{ pageSizes: true, pageSize: 12 }"
                     :searchSettings="{ ignoreCase: true, ignoreAccent: true }">
 
@@ -94,201 +99,156 @@ const AppTemplate = /*html*/ `
         </div>
     </div>
 </div>
-
 `;
 
 Vue.component('AppVue', {
     template: AppTemplate,
-    data: function () {
+    // Aqui você define o "template"(HTML) que o Vue vai renderizar.
+    // No seu caso, o template vem da constante AppTemplate que você criou antes.
+
+    data() {
         return {
-            valorSequencia: null,
-            valorTexto: "",
-            dataSource: [],
-            dropdown: null,
-            valorData: null,
-            selecionadoLancamento: null,
-            opcoesLancamento: [],
-            campos: { value: 'id', text: 'texto' },
-            valor: 0,
-            selecionadoFluxo: null,
-            opcoesFluxo: [],
-            obs: "",
-            listaItens: [],
-            btnEdit: false,
-        }
+            valorSequencia: null,           // campo ligado ao input da sequencia(v - model="valorId")
+            valorData: null,                // campo ligado ao input da data(v - model="valorId")
+            selecionadoLancamento: null,    // campo ligado ao select do tipo de lancamento(v - model="valorId")
+            selecionadoFluxo: null,         // campo ligado ao select do tipo de fluxo(v - model="valorId")
+            valor: 0,                       // campo ligado ao input do valor(v - model="valorId")
+            obs: "",                        // campo ligado ao input da observação(v - model="valorId")
+            dataSource: [],                 // dados do grid
+            opcoesLancamento: [],           // dropdown Lançamento
+            opcoesFluxo: [],                // dropdown Fluxo
+            campos: { value: 'id', text: 'texto' }, // mapeamento dropdown
+            isEditing: false,               // controle de edição
+            toolbar: [
+                "Search",
+                { text: "Editar", prefixIcon: "fas fa-edit", id: "editar" },
+                { text: "Excluir", prefixIcon: "fas fa-trash", id: "excluir" }
+            ]
+        };
     },
-    mounted: function () {
+    mounted() {
+        // Ao montar o componente, carregamos dados e selects
         this.reqLista();
-        this.selectLancamento();
-        this.selectFluxo();
+        this.carregarDropdowns();
     },
     methods: {
 
+        /** Reset de formulário */
         resetForm() {
-            // Reseta os campos do formulário para os valores iniciais
             this.valorSequencia = null;
             this.valorData = null;
             this.selecionadoLancamento = null;
-            this.valor = null;
             this.selecionadoFluxo = null;
+            this.valor = 0;
             this.obs = "";
+            this.isEditing = false;
         },
 
+        /** Monta payload para enviar ao backend */
         payload() {
-            // Monta o objeto com os dados do formulário para enviar ao backend
             return {
-                valorSequencia: this.valorSequencia,
-                valorData: this.valorData,
-                selecionadoLancamento: this.selecionadoLancamento,
-                valor: this.valor, // Pega valor via ref (se não existir, usa 0)
-                selecionadoFluxo: this.selecionadoFluxo,
+                sequencia: this.valorSequencia,
+                data: this.valorData,
+                lancamento: this.selecionadoLancamento,
+                valor: this.valor,
+                fluxo: this.selecionadoFluxo,
                 obs: this.obs
             };
         },
 
-        // Chama o backend e preenche o Grid
-        reqLista() {
-            const data = this.payload();
-
-            axios.post(BASE + "/lancamento/listaLancamento", data)
+        /** Função genérica para enviar dados ao backend e tratar resposta */
+        sendData(url, data, successCallback) {
+            axios.post(BASE + url, data)
                 .then(res => {
                     if (res.data.codigo === 1) {
-                        this.dataSource = res.data.dados;
+                        successCallback && successCallback(res.data);
                     } else {
                         mainLayout.sToast(res.data.texto || 'Erro desconhecido', '', 'error');
                     }
                 })
-                .catch(() => {
-                    mainLayout.sToast('Erro ao conectar com o servidor.', '', 'error');
-                });
+                .catch(() => mainLayout.sToast('Erro ao conectar com o servidor.', '', 'error'));
+        },
+
+        /** Carrega dados do grid */
+        reqLista() {
+            this.sendData('/lancamento/listaLancamento', {}, res => {
+                this.dataSource = res.dados; // popula grid
+                this.resetForm();
+            });
+        },
+
+        /** Cadastra novo lançamento */
+        reqLanca() {
+            this.sendData('/lancamento/addLancamento', this.payload(), res => {
+                mainLayout.sToast(res.texto, '', 'success');
+                this.reqLista();
+            });
+        },
+
+        /** Salva edição de lançamento */
+        reqSave() {
+            this.sendData('/lancamento/save', this.payload(), res => {
+                mainLayout.sToast(res.texto, '', 'success');
+                this.reqLista();
+            });
+        },
+
+        /** Cancela edição */
+        reqCancel() {
             this.resetForm();
         },
 
-        // Manda para o back as informações preenchidas nos inputs
-        reqLanca() {
-            const data = this.payload();
-            axios.post(BASE + "/lancamento/addLancamento", data)
-                .then(res => {
-                    if (res.data.codigo === 1) {
-                        alert(res.data.texto);
+        /** Carrega opções de dropdowns */
+        carregarDropdowns() {
+            // Lançamentos
+            axios.post(BASE + '/lancamento/selectLancamento')
+                .then(res => this.opcoesLancamento = res.data.map(i => ({ id: i.sequencia, texto: i.descricao })))
+                .catch(() => mainLayout.sToast('Erro ao carregar lançamentos', '', 'error'));
+
+            // Fluxos
+            axios.post(BASE + '/lancamento/selectFluxo')
+                .then(res => this.opcoesFluxo = res.data.map(i => ({ id: i.codigo, texto: i.descricao })))
+                .catch(() => mainLayout.sToast('Erro ao carregar fluxos', '', 'error'));
+        },
+
+        /** Retorna primeiro item selecionado do grid */
+        getSelectedItem() {
+            const items = this.$refs.grid.getSelectedRecords();
+            if (!items.length) {
+                mainLayout.sToast('Por favor, selecione um registro.', '', 'warning');
+                return null;
+            }
+            return items[0];
+        },
+
+        /** Handler do toolbar (editar / excluir) */
+        toolbarClick(args) {
+            const lancamento = this.getSelectedItem();
+            if (!lancamento) return;
+
+            if (args.item.id === 'editar') {
+                // Carrega dados para edição
+                axios.post(BASE + '/lancamento/loadData', { id: lancamento.sequencia })
+                    .then(res => {
+                        const d = res.data[0];
+                        this.valorSequencia = d.sequencia;
+                        this.valorData = d.data;
+                        this.selecionadoLancamento = d.lancamento;
+                        this.selecionadoFluxo = d.fluxo;
+                        this.valor = d.valor;
+                        this.obs = d.obs;
+                        this.isEditing = true; // ativa edição
+                    });
+            } else if (args.item.id === 'excluir') {
+                if (!confirm('Tem certeza que deseja excluir esse item?')) return;
+
+                axios.post(BASE + '/lancamento/del', { id: lancamento.sequencia })
+                    .then(res => {
+                        mainLayout.sToast(res.data.texto, '', 'success');
                         this.reqLista();
-                        this.resetForm();
-                    } else {
-                        mainLayout.sToast(res.data.texto || 'Erro desconhecido', '', 'error');
-                    }
-                })
-                .catch(() => {
-                    alert("Erro ao cadastrar.");
-                });
-        },
-
-        // Função que busca os tipos de lançamento do backend e preenche o select correspondente
-        selectLancamento() {
-            axios.post(BASE + "/lancamento/selectLancamento").then(res => {
-                // Verifica se a resposta existe e é um array
-                if (res && Array.isArray(res.data)) {
-                    // Mapeia os dados recebidos para o formato esperado pelo select
-                    this.opcoesLancamento = res.data.map(item => ({
-                        id: item.sequencia,    // Usa 'sequencia' como identificador único
-                        texto: item.descricao  // Usa 'descricao' como texto exibido
-                    }));
-                } else {
-                    alert("Erro ao carregar as opções de lançamento.");
-                }
-            })
-                .catch(() => {
-                    alert("Erro ao conectar com o servidor.");
-                })
-        },
-
-        // Função que busca os tipos de fluxo do backend e preenche o select correspondente
-        selectFluxo() {
-            axios.post(BASE + "/lancamento/selectFluxo").then(res => {
-                if (res && Array.isArray(res.data)) {
-                    this.opcoesFluxo = res.data.map(item => ({
-                        id: item.codigo,
-                        texto: item.descricao
-                    }));
-                } else {
-                    alert("Erro ao carregar as opções de fluxo.");
-                }
-            })
-                .catch(() => {
-                    alert("Erro ao conectar com o servidor.");
-                })
-        },
-
-        // Função que cancela a edição e reseta o formulário
-        reqCancel() {
-            this.resetForm();       // Limpa os campos do formulário
-            this.isEditing = false; // Define que não está mais em modo de edição
-        },
-
-        // Função que salva os dados do formulário
-        reqSave() {
-            const data = this.payload(); // Obtém os dados do formulário
-            axios.post(BASE + "/lancamento/save", data)
-                .then(() => {
-                    this.reqLista();      // Atualiza a lista de lançamentos
-                    this.resetForm();     // Limpa o formulário
-                    this.isEditing = false; // Sai do modo de edição
-                });
-        },
-
-        // Função que trata os cliques na toolbar (editar ou excluir)
-        toolbarClick(id) {
-            const itemSelecionado = this.$refs.grid.getSelectedRecords(); // Obtém os registros selecionados na grid
-
-            // Se o botão clicado for 'editar'
-            if (id.item.id == 'editar') {
-                if (itemSelecionado.length > 0) {
-                    const lancamento = itemSelecionado[0]; // Pega o primeiro item selecionado
-                    axios.post(BASE + "/lancamento/loadData", { id: lancamento.sequencia })
-                        .then(res => {
-                            const dados = res.data[0]; // Assume que a resposta é um array e pega o primeiro item
-                            // Preenche os campos do formulário com os dados recebidos
-                            this.valorSequencia = dados.sequencia;
-                            this.valorData = dados.data;
-                            this.selecionadoLancamento = dados.lancamento;
-                            this.valor = dados.valor;
-                            this.selecionadoFluxo = dados.fluxo;
-                            this.obs = dados.obs;
-                            this.btnEdit = true; // Ativa o botão de edição
-                        })
-                        .catch(() => {
-                            alert("Erro ao carregar dados para edição.");
-                        });
-                } else {
-                    mainLayout.sToast('Por favor, selecione um registro.', '', 'warning');
-                }
+                    });
             }
-            // Se o botão clicado for 'excluir'
-            else if (id.item.id == 'excluir') {
-                const itemSelecionado = this.$refs.grid.getSelectedRecords(); // Obtém os registros selecionados
-
-                if (confirm("Tem certeza que deseja excluir esse item?")) { // Confirmação do usuário
-                    const lancamento = itemSelecionado[0]; // Pega o primeiro item selecionado
-                    var params = { id: lancamento.sequencia }; // Prepara os parâmetros para exclusão
-                    axios.post(BASE + "/lancamento/del", params)
-                        .then(res => {
-                            if (res.data.codigo == 1) {
-                                alert(res.data.texto, 'success');
-                                this.reqLista();
-                            } else {
-                                alert(resp.data.texto, 'warning');
-                            }
-                        })
-                        .catch(() => {
-                            alert("Erro ao conectar com o servidor.");
-                        });
-                }
-            }
-        },
-    },
-    watch: {
-        'valorTexto': function (args) {
-            console.log(args);
         }
-    }
-})
 
+    }
+});

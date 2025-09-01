@@ -23,7 +23,7 @@ class Login_model extends Model
         $sth->execute([':id' => $usuario]);
         $dados = $sth->fetch(PDO::FETCH_ASSOC);
 
-        if ($dados && hash('sha256', $senha) === $dados['senha']) {
+        if ($dados && hash('sha256', (string)$senha) === $dados['senha']) {
             unset($dados['senha']);
             return [
                 'codigo' => 1,

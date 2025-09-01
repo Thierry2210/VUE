@@ -1,13 +1,11 @@
 <?php
 
-class View {
+class View
+{
     // Titulo da View (pagina)
     public $title = "Titulo";
 
-    function __construct()
-    {
-        
-    }
+    function __construct() {}
     // renderiza a pagina com o nome da view passado no parametro
     public function render($name, $noInclude = false)
     {

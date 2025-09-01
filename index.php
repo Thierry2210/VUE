@@ -5,10 +5,11 @@ require 'config.php';
 // funcao que carrega as classes automaticamente
 spl_autoload_register('myAutoloader');
 
-function myAutoloader($class) {
+function myAutoloader($class)
+{
     /*caso ignorar load da classe*/
     if (strpos($class, 'Fpdi') === false) {
-        require_once LIBS . $class .".php";
+        require_once LIBS . $class . ".php";
     }
 }
 

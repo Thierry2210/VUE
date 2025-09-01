@@ -19,7 +19,22 @@ class Lancamento_model extends Model
     // Listar todos os lançamentos
     public function listaLancamento()
     {
-        $sql = "SELECT * FROM fluxocaixa.lancamento ORDER BY sequencia";
+        $sql = "SELECT 
+                    l.sequencia,
+                    DATE_FORMAT(l.data, '%d/%m/%Y') AS data,
+                    l.valor,
+                    l.obs,
+                    T.descricao as fluxo,
+                    T2.descricao as tipo
+                FROM 
+                    fluxocaixa.lancamento l,
+                    fluxocaixa.tipofluxo t,
+                    fluxocaixa.tipolancamento t2
+                where
+                    L.fluxo = T.codigo
+                    and L.tipo = T2.sequencia 
+                ORDER BY sequencia";
+
         $result = $this->select($sql);
         $msg = [
             "codigo" => 1,

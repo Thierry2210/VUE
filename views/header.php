@@ -69,95 +69,54 @@
     </header>
 
     <!--========== NAV ==========-->
-    <div class="nav" id="navbar" style="padding-left: 20px;">
-        <nav class="nav__container">
-            <div>
-                <a href="<?= URL ?>" class="nav__link nav__logo">
-                    <i class='bx bx-home nav__icon'></i>
-                    <span class="nav__logo-name">Início</span>
-                </a>
+    <!-- Navbar -->
+    <div id="appNav">
+        <div class="nav" id="navbar" style="padding-left: 20px;">
+            <nav class="nav__container">
+                <div>
+                    <a href="<?= URL ?>" class="nav__link nav__logo">
+                        <i class='bx bx-home nav__icon'></i>
+                        <span class="nav__logo-name">Início</span>
+                    </a>
 
-                <div class="nav__list">
-                    <div class="nav__items">
-                        <h3 class="nav__subtitle">Perfil</h3>
+                    <div class="nav__list">
+                        <div class="nav__items">
+                            <h3 class="nav__subtitle">Perfil</h3>
+                            <div class="nav__dropdown">
+                                <a href="#" class="nav__link">
+                                    <i class='bx bx-user nav__icon'></i>
+                                    <span class="nav__name">Opções do Perfil</span>
+                                    <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
+                                </a>
 
-                        <div class="nav__dropdown">
-                            <a href="#" class="nav__link">
-                                <i class='bx bx-user nav__icon'></i>
-                                <span class="nav__name">Opções do Perfil</span>
-                                <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
-                            </a>
-
-                            <div class="nav__dropdown-collapse">
-                                <div class="nav__dropdown-content">
-                                    <a href="<?= URL ?>cadastro" class="nav__dropdown-item">Cadastro de Usuários</a>
+                                <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel == 1">
+                                    <div class="nav__dropdown-content">
+                                        <a href="<?= URL ?>cadastro" class="nav__dropdown-item">Cadastro de Usuários</a>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="nav__dropdown-collapse" v-if="!isLogged">
-                                <div class="nav__dropdown-content">
-                                    <a href="<?= URL ?>login" class="nav__dropdown-item">Login</a>
+                                <div class="nav__dropdown-collapse" v-if="!isLogged">
+                                    <div class="nav__dropdown-content">
+                                        <a href="<?= URL ?>login" class="nav__dropdown-item">Login</a>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="nav__dropdown-collapse">
-                                <div class="nav__dropdown-content">
-                                    <a href="<?= URL ?>lancamento" class="nav__dropdown-item">Lançamentos</a>
+                                <div class="nav__dropdown-collapse" v-if="isLogged">
+                                    <div class="nav__dropdown-content">
+                                        <a href="<?= URL ?>lancamento" class="nav__dropdown-item">Lançamentos</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- <a href="#" class="nav__link">
-                            <i class='bx bx-message-rounded nav__icon'></i>
-                            <span class="nav__name">Mensagens</span>
-                        </a>
-
-                        <a href="<?= URL ?>files" class="nav__link">
-                            <i class='bx bx-upload nav__icon'></i>
-                            <span class="nav__name">Arquivos</span>
-                        </a>
-
-                        <a href="<?= URL ?>coloracao" class="nav__link">
-                            <i class='bx bxs-pen nav__icon'></i>
-                            <span class="nav__name">Colorações</span>
-                        </a>
-                    </div>
-
-                    <div class="nav__items">
-                        <h3 class="nav__subtitle">Menu</h3>
-
-                        <div class="nav__dropdown">
-                            <a href="#" class="nav__link">
-                                <i class='bx bx-bell nav__icon'></i>
-                                <span class="nav__name">Nodificações</span>
-                                <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
-                            </a>
-
-                            <div class="nav__dropdown-collapse">
-                                <div class="nav__dropdown-content">
-                                    <a href="<?= URL ?>nodificacao" class="nav__dropdown-item">Aparecer Nodificação</a>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <a href="<?= URL ?>map" class="nav__link">
-                            <i class='bx bx-compass nav__icon'></i>
-                            <span class="nav__name">Explorar</span>
-                        </a>
-                        <a href="#" class="nav__link">
-                            <i class='bx bx-bookmark nav__icon'></i>
-                            <span class="nav__name">Salvos</span>
-                        </a>
-                    </div>
-                </div>
-            </div> -->
 
                         <a href="#" class="nav__link nav__logout" v-if="isLogged" @click="logout">
                             <i class='bx bx-log-out nav__icon'></i>
                             <span class="nav__name">Sair</span>
                         </a>
-        </nav>
+                    </div>
+                </div>
+            </nav>
+        </div>
     </div>
 
     <div id="mainLayout">
@@ -165,30 +124,31 @@
     </div>
 
     <script>
-        // Passa o estado do usuário logado via PHP para o JS
-        const userFromStorage = localStorage.getItem("usuario");
-        const usuario = userFromStorage ? JSON.parse(userFromStorage) : null;
+        const usuario = JSON.parse(localStorage.getItem('usuario')) || null;
 
         new Vue({
-            el: '#appNav',
+            el: '#appNav', // Este é o ID do contêiner de navegação
             data: {
-                isLogged: !!usuario,
+                isLogged: !!usuario, // Checa se o usuário está logado
                 usuario: usuario
             },
             methods: {
                 logout() {
                     localStorage.removeItem("usuario");
-                    this.isLogged = false;
-                    this.usuario = null;
-                    // Redireciona para a página de login ou home
-                    window.location.href = "<?= URL ?>login";
+                    this.usuario = null; // Remove o usuário do localStorage
+                    this.isLogged = false; // Atualiza o estado do Vue
+                    // Redireciona para a página de login
+                    window.location.href = BASE + "/login";
                 }
             }
-        })
+        });
 
         const mainLayout = new Vue({
-            el: '#mainLayout',
-            template: `<AppVue></AppVue>`,
+            el: '#mainLayout', // Este é o ID do contêiner do layout principal
+            data: {
+                // Qualquer outra informação necessária para o layout principal
+            },
+            template: `<AppVue></AppVue>`, // Carrega o componente VueApp
         });
     </script>
 
