@@ -46,6 +46,11 @@
     <script src="<?= URL ?>public/dist/js/common.js" type="text/javascript"></script>
     <script src="<?= URL ?>public/mdb/js/mdb.min.js"></script>
 
+    <!-- Link Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+
+
     <?php
     if (isset($this->js)) {
         foreach ($this->js as $j) {
@@ -71,47 +76,53 @@
     <!--========== NAV ==========-->
     <!-- Navbar -->
     <div id="appNav">
-        <div class="nav" id="navbar" style="padding-left: 20px;">
+        <div class="nav" id="navbar" style="padding-left: 20px; background-color: #0072BC">
             <nav class="nav__container">
                 <div>
                     <a href="<?= URL ?>" class="nav__link nav__logo">
-                        <i class='bx bx-home nav__icon'></i>
-                        <span class="nav__logo-name">Início</span>
+                        <i class='bx bx-home nav__icon' style="color: white;"></i>
+                        <span class="nav__logo-name" style="color: white;">Início</span>
                     </a>
 
                     <div class="nav__list">
                         <div class="nav__items">
-                            <h3 class="nav__subtitle">Perfil</h3>
+                            <h3 class="nav__subtitle" style="color: white;">Perfil</h3>
                             <div class="nav__dropdown">
                                 <a href="#" class="nav__link">
-                                    <i class='bx bx-user nav__icon'></i>
-                                    <span class="nav__name">Opções do Perfil</span>
-                                    <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
+                                    <i class='bx bx-user nav__icon' style="color: white;"></i>
+                                    <span class="nav__name" style="color: white;">Opções do Perfil</span>
+                                    <i class='bx bx-chevron-down nav__icon nav__dropdown-icon' style="color: white;"></i>
                                 </a>
 
                                 <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel == 1">
                                     <div class="nav__dropdown-content">
-                                        <a href="<?= URL ?>cadastro" class="nav__dropdown-item">Cadastro de Usuários</a>
+                                        <a href="<?= URL ?>cadastro" class="nav__dropdown-item" style="color: black;">Cadastro de Usuários</a>
+                                    </div>
+                                </div>
+
+                                <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel < 3">
+                                    <div class="nav__dropdown-content">
+                                        <a href="<?= URL ?>tipolancamento" class="nav__dropdown-item" style="color: black;">Tipos de Lançamentos</a>
                                     </div>
                                 </div>
 
                                 <div class="nav__dropdown-collapse" v-if="!isLogged">
                                     <div class="nav__dropdown-content">
-                                        <a href="<?= URL ?>login" class="nav__dropdown-item">Login</a>
+                                        <a href="<?= URL ?>login" class="nav__dropdown-item" style="color: black;">Login</a>
                                     </div>
                                 </div>
 
                                 <div class="nav__dropdown-collapse" v-if="isLogged">
                                     <div class="nav__dropdown-content">
-                                        <a href="<?= URL ?>lancamento" class="nav__dropdown-item">Lançamentos</a>
+                                        <a href="<?= URL ?>lancamento" class="nav__dropdown-item" style="color: black;">Lançamentos</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <a href="#" class="nav__link nav__logout" v-if="isLogged" @click="logout">
-                            <i class='bx bx-log-out nav__icon'></i>
-                            <span class="nav__name">Sair</span>
+                            <i class='bx bx-log-out nav__icon' style="color: white;"></i>
+                            <span class="nav__name" style="color: white;">Sair</span>
                         </a>
                     </div>
                 </div>

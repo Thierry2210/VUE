@@ -49,10 +49,10 @@ class Lancamento_model extends Model
     {
         $dados = $this->getRequestData();
 
-        $valorData = $dados['valorData'] ?? null;
-        $selecionadoLancamento = $dados['selecionadoLancamento'] ?? null;
+        $valorData = $dados['data'] ?? null;
+        $selecionadoLancamento = $dados['lancamento'] ?? null;
         $valor = $dados['valor'] ?? 0;
-        $selecionadoFluxo = $dados['selecionadoFluxo'] ?? null;
+        $selecionadoFluxo = $dados['fluxo'] ?? null;
         $obs = $dados['obs'] ?? "";
 
         $result = $this->insert(
@@ -110,8 +110,10 @@ class Lancamento_model extends Model
                     l.obs,
                     l.fluxo,
                     l.tipo AS lancamento
-                FROM fluxocaixa.lancamento l
-                WHERE l.sequencia = :id",
+                FROM 
+                    fluxocaixa.lancamento l
+                WHERE 
+                    l.sequencia = :id",
                 ["id" => $id]
             );
         }

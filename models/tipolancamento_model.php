@@ -1,10 +1,8 @@
 <?php
 
-session_start();
-
 require_once("util/param.php");
 
-class Cadastro_Model extends Model
+class TipoLancamento_model extends Model
 {
     public function __construct()
     {
@@ -18,20 +16,14 @@ class Cadastro_Model extends Model
         return $x ?? [];
     }
 
-
-    public function listaUsuario()
+    // Listar todos os lançamentos
+    public function listaTipoLancamento()
     {
         $sql = "SELECT 
-                    u.id,
-                    u.nome,
-                    u.senha,
-                    CONCAT(CONCAT(u.nivel , ' - '), n.descricao) as nivel
+                    *
                 FROM 
-                    fluxocaixa.usuario u,
-                    fluxocaixa.nivelusuario n 
-                where
-                    u.nivel = n.codigo  
-                ORDER BY id";
+                    fluxocaixa.tipolancamento tl 
+                ORDER BY sequencia";
 
         $result = $this->select($sql);
         $msg = [
@@ -42,22 +34,17 @@ class Cadastro_Model extends Model
         echo json_encode($msg);
     }
 
-    public function insertUsuario()
+    // Inserir novo lançamento
+    public function insertTipoLancamento()
     {
         $dados = $this->getRequestData();
 
-        $valorId = $dados['id'] ?? null;
-        $valorNome = $dados['nome'] ?? '';
-        $valorSenha = $dados['senha'] ?? '';
-        $selecionadoNivel = $dados['nivel'] ?? null;
+        $valorDescricao = $dados['descricao'] ?? '';
 
         $result = $this->insert(
-            "fluxocaixa.usuario",
+            "fluxocaixa.tipolancamento",
             [
-                "id"    => $valorId,
-                "nome"  => $valorNome,
-                "senha" => hash('sha256', $valorSenha), // Aplica SHA-256 na senha,
-                "nivel" => $selecionadoNivel,
+                "descricao" => $valorDescricao
             ]
         );
 
@@ -67,10 +54,10 @@ class Cadastro_Model extends Model
             $msg = array("codigo" => 0, "texto" => "Erro ao inserir");
         }
 
-        echo json_encode($msg);
+        echo (json_encode($msg));
     }
 
-
+    // Excluir lançamento
     public function del()
     {
         $dados = $this->getRequestData();
@@ -79,7 +66,7 @@ class Cadastro_Model extends Model
         $msg = array("codigo" => 0, "texto" => "Erro ao excluir.");
 
         if ($id > 0) {
-            $result = $this->delete("fluxocaixa.usuario", "id='$id'");
+            $result = $this->delete("fluxocaixa.tipolancamento", "sequencia='$id'");
             if ($result) {
                 $msg = array("codigo" => 1, "texto" => "Registro exluído com sucesso.");
             }
@@ -88,25 +75,23 @@ class Cadastro_Model extends Model
         echo json_encode($msg);
     }
 
+    // Carregar um lançamento por sequencia
     public function loadData()
     {
-        $dados = $this->getRequestData(); // função helper que criamos
+        $dados = $this->getRequestData();
         $id = (int)($dados['id'] ?? 0);
 
         $result = [];
 
-
         if ($id > 0) {
             $result = $this->select(
                 "SELECT 
-                    u.id,
-                    u.nome,
-                    u.senha,
-                    u.nivel
+                    tl.sequencia,
+                    tl.descricao
                 FROM 
-                    fluxocaixa.usuario u
+                    fluxocaixa.tipolancamento tl
                 WHERE 
-                    u.id=:id",
+                    tl.sequencia = :id",
                 ["id" => $id]
             );
         }
@@ -114,26 +99,22 @@ class Cadastro_Model extends Model
         echo json_encode($result);
     }
 
-
+    // Atualizar lançamento
     public function save()
     {
         $dados = $this->getRequestData();
 
-        $valorId = $dados['id'] ?? null;
-        $valorNome = $dados['nome'] ?? '';
-        $valorSenha = $dados['senha'] ?? '';
-        $selecionadoNivel = $dados['nivel'] ?? null;
+        $valorSequencia = $dados['sequencia'] ?? null;
+        $valorDescricao = $dados['descricao'] ?? '';
 
         $msg = array("codigo" => 0, "texto" => "Erro ao atualizar.");
 
-        if ($valorId > 0) {
+        if ($valorSequencia > 0) {
             $dadosSave = array(
-                "nome" => $valorNome,
-                "senha" => $valorSenha,
-                "nivel" => $selecionadoNivel
+                "descricao" => $valorDescricao
             );
 
-            $result = $this->update("fluxocaixa.usuario", $dadosSave, "id='$valorId'");
+            $result = $this->update("fluxocaixa.tipolancamento", $dadosSave, "sequencia='$valorSequencia'");
 
             if ($result) {
                 $msg = array("codigo" => 1, "texto" => "Registro atualizado com sucesso.");
@@ -141,18 +122,5 @@ class Cadastro_Model extends Model
         }
 
         echo (json_encode($msg));
-    }
-
-
-    public function selectNivelUsuario()
-    {
-        $result = $this->select("
-        select codigo,descricao 
-        from fluxocaixa.nivelusuario 
-        order by descricao");
-
-        $result = json_encode($result);
-
-        echo ($result);
     }
 }

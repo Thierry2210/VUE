@@ -1,52 +1,31 @@
 const AppTemplate = /*html*/ `
+
 <div class="control-section" style="margin-top: 5%">
-
+    <!-- Toast -->
     <ejs-toast ref="toast" :position="{ X: 'Center', Y: 'Top' }"></ejs-toast>
-
+    
     <div class="row">
-        <!-- Linha de inputs principais -->
-        <div class="row" style="display: flex; justify-content: center; gap: 10px;">
             <!-- ID-->
             <div class="col-md-2">
                 <ejs-textbox 
-                    placeholder="Id" 
-                    v-model="valorId" 
+                    placeholder="Tipo Lancamento" 
+                    v-model="valorSequencia" 
+                    type="hidden"
+                    cssClass="e-outline">
+                </ejs-textbox>
+            </div>
+        <!-- Linha de inputs principais -->
+        <div class="row" style="display: flex; justify-content: center; gap: 10px;">
+            
+            <!-- descricao -->
+            <div class="col-md-4">
+                <ejs-textbox 
+                    placeholder="Descrição" 
+                    v-model="valorDescricao" 
                     type="text"
                     cssClass="e-outline">
                 </ejs-textbox>
             </div>
-
-            <!-- Nome -->
-            <div class="col-md-3">
-                <ejs-textbox 
-                    placeholder="Nome" 
-                    v-model="valorNome" 
-                    type="text"
-                    cssClass="e-outline">
-                </ejs-textbox>
-            </div>
-
-            <!-- Senha -->
-            <div class="col-md-2">
-                <ejs-textbox 
-                    placeholder="Senha" 
-                    v-model="valorSenha" 
-                    type="password"
-                    cssClass="e-outline">
-                </ejs-textbox>
-            </div>
-
-            <!-- Nível -->
-            <div class="col-md-2">
-                <ejs-dropdownlist
-                    :dataSource="opcoesNivel"
-                    v-model="selecionadoNivel"
-                    placeholder="Selecione um nível"
-                    :fields="campos"
-                    cssClass="e-outline">
-                </ejs-dropdownlist>
-            </div>
-        </div>
 
         <!-- Botões -->
         <div class="row" style="margin-top: 20px; justify-content: center;">
@@ -76,10 +55,8 @@ const AppTemplate = /*html*/ `
                     :searchSettings="{ ignoreCase: true, ignoreAccent: true }">
 
                     <e-columns>
-                        <e-column field="id" headerText="ID"></e-column>
-                        <e-column field="nome" headerText="Nome"></e-column>
-                        <e-column field="senha" headerText="Senha"></e-column>
-                        <e-column field="nivel" headerText="Nível"></e-column>
+                        <e-column field="sequencia" headerText="Sequencia"></e-column>
+                        <e-column field="descricao" headerText="Descricao"></e-column>
                     </e-columns>
                 </ejs-grid>
             </div>
@@ -91,15 +68,9 @@ const AppTemplate = /*html*/ `
 Vue.component('AppVue', {
     template: AppTemplate,
     data() {
-        const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
         return {
-            usuarioNivel: usuario.nivel || 0,
-            valorId: null,
-            valorNome: "",
-            valorSenha: "",
-            selecionadoNivel: null,
-            opcoesNivel: [],
-            campos: { value: 'id', text: 'texto' },
+            valorSequencia: null,
+            valorDescricao: "",
             dataSource: [],
             isEditing: false,
             toolbar: [
@@ -111,7 +82,6 @@ Vue.component('AppVue', {
     },
     mounted() {
         this.reqLista();
-        this.selectNivelUsuario();
     },
     methods: {
         showToast(message, type = 'info') {
@@ -129,19 +99,15 @@ Vue.component('AppVue', {
         },
 
         resetForm() {
-            this.valorId = null;
-            this.valorNome = "";
-            this.valorSenha = "";
-            this.selecionadoNivel = null;
+            this.valorSequencia = null;
+            this.valorDescricao = "";
             this.isEditing = false;
         },
 
         payload() {
             return {
-                id: this.valorId,
-                nome: this.valorNome,
-                senha: this.valorSenha,
-                nivel: this.selecionadoNivel
+                sequencia: this.valorSequencia,
+                descricao: this.valorDescricao,
             };
         },
 
@@ -151,28 +117,28 @@ Vue.component('AppVue', {
                     if (res.data.codigo === 1) {
                         successCallback && successCallback(res.data);
                     } else {
-                        this.showToast(res.data.texto || 'Erro desconhecido', 'error');
+                        this.showToast(res.data.texto, 'error');
                     }
                 })
-                .catch(() => this.showToast('Erro ao conectar com o servidor.', 'error'));
+                .catch(() => this.showToast("Por favor, selecione um registro", 'error'));
         },
 
         reqLista() {
-            this.sendData('/cadastro/listaUsuario', {}, res => {
+            this.sendData('/tipolancamento/listaTipoLancamento', {}, res => {
                 this.dataSource = res.dados;
                 this.resetForm();
             });
         },
 
         reqLanca() {
-            this.sendData('/cadastro/addUsuario', this.payload(), res => {
+            this.sendData('/tipolancamento/addTipoLancamento', this.payload(), res => {
                 this.showToast(res.texto, 'success');
                 this.reqLista();
             });
         },
 
         reqSave() {
-            this.sendData('/cadastro/save', this.payload(), res => {
+            this.sendData('/tipolancamento/save', this.payload(), res => {
                 this.showToast(res.texto, 'success');
                 this.reqLista();
             });
@@ -182,21 +148,11 @@ Vue.component('AppVue', {
             this.resetForm();
         },
 
-        selectNivelUsuario() {
-            axios.post(BASE + "/cadastro/selectNivelUsuario")
-                .then(res => {
-                    this.opcoesNivel = res.data.map(item => ({
-                        id: item.codigo,
-                        texto: item.descricao
-                    }));
-                })
-                .catch(() => mainLayout.sToast('Erro ao carregar níveis', 'error'));
-        },
-
+        /** Retorna primeiro item selecionado do grid */
         getSelectedItem() {
             const items = this.$refs.grid.getSelectedRecords();
             if (!items.length) {
-                this.showToast('Por favor, selecione um registro.', 'warning');
+                this.showToast('Por favor, selecione um registro.', '', 'warning');
                 return null;
             }
             return items[0];
@@ -207,21 +163,19 @@ Vue.component('AppVue', {
             if (!itemSelecionado) return;
 
             if (args.item.id === 'editar') {
-                axios.post(BASE + "/cadastro/loadData", { id: itemSelecionado.id })
+                axios.post(BASE + "/tipolancamento/loadData", { id: itemSelecionado.sequencia })
                     .then(res => {
                         const d = res.data[0];
-                        this.valorId = d.id;
-                        this.valorNome = d.nome;
-                        this.valorSenha = d.senha;
-                        this.selecionadoNivel = d.nivel;
+                        this.valorSequencia = d.sequencia;
+                        this.valorDescricao = d.descricao;
                         this.isEditing = true;
                     });
             } else if (args.item.id === 'excluir') {
                 if (!confirm("Tem certeza que deseja excluir esse item?")) return;
 
-                axios.post(BASE + "/cadastro/del", { id: itemSelecionado.id })
+                axios.post(BASE + "/tipolancamento/del", { id: itemSelecionado.sequencia })
                     .then(res => {
-                        this.showToast(res.data.texto, 'success');
+                        this.showToast(res.texto, 'success');
                         this.reqLista();
                     });
             }
