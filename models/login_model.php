@@ -19,12 +19,10 @@ class Login_model extends Model
     public function autenticar($usuario, $senha)
     {
         $sql = "SELECT id, nome, senha, nivel FROM fluxocaixa.usuario WHERE id = :id";
-        $sth = $this->db->prepare($sql);
-        $sth->execute([':id' => $usuario]);
-        $dados = $sth->fetch(PDO::FETCH_ASSOC);
+        $dados = $this->select($sql, [':id' => $usuario]);
 
-        if ($dados && hash('sha256', (string)$senha) === $dados['senha']) {
-            unset($dados['senha']);
+        if ($dados && hash('sha256', (string)$senha) === $dados[0]['senha']) {
+            unset($dados[0]['senha']);
             return [
                 'codigo' => 1,
                 'texto' => 'Login realizado com sucesso',

@@ -11,7 +11,8 @@ const AppTemplate = /*html*/ `
                     placeholder="Tipo Lancamento" 
                     v-model="valorSequencia" 
                     type="hidden"
-                    cssClass="e-outline">
+                    cssClass="e-outline"
+                    floatLabelType="Auto">
                 </ejs-textbox>
             </div>
         <!-- Linha de inputs principais -->
@@ -23,7 +24,8 @@ const AppTemplate = /*html*/ `
                     placeholder="Descrição" 
                     v-model="valorDescricao" 
                     type="text"
-                    cssClass="e-outline">
+                    cssClass="e-outline"
+                    floatLabelType="Auto">
                 </ejs-textbox>
             </div>
 
@@ -74,7 +76,7 @@ Vue.component('AppVue', {
             dataSource: [],
             isEditing: false,
             toolbar: [
-                "Search",
+                { text: "Search", id: "search" },
                 { text: "Editar", prefixIcon: "fas fa-edit", id: "editar" },
                 { text: "Excluir", prefixIcon: "fas fa-trash", id: "excluir" }
             ]
@@ -152,13 +154,17 @@ Vue.component('AppVue', {
         getSelectedItem() {
             const items = this.$refs.grid.getSelectedRecords();
             if (!items.length) {
-                this.showToast('Por favor, selecione um registro.', '', 'warning');
+                this.showToast('Por favor, selecione um registro.', 'warning');
                 return null;
             }
             return items[0];
         },
 
         toolbarClick(args) {
+            if (args.item.id === 'search') {
+                return;
+            }
+
             const itemSelecionado = this.getSelectedItem();
             if (!itemSelecionado) return;
 

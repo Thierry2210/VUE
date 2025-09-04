@@ -1,27 +1,41 @@
 const AppTemplate = /*html*/`
 
-<div class="control-section" style="height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+<div class="control-section h- d-flex align-items-center justify-content-center p-4" style="height: 100vh;">
 
     <ejs-toast ref="toast" :position="{ X: 'Center', Y: 'Top' }"></ejs-toast>
+        <div style="width: 300px;">
+            <div class="row d-flex justify-content-center mt-4">
+                <div class="col-md-12">
+                    <ejs-textbox ref="texto" cssClass="e-outline" floatLabelType="Auto" v-model="valorId" placeholder="Escreva seu id aqui" style="width: 100%;"></ejs-textbox>
+                </div>
+            </div>
 
-    <div style="min-width: 300px;">
-        <div class="row" style="display: flex; justify-content: center; margin-top: 20px;">
-            <div class="col-md-12">
-                <ejs-textbox ref="texto" cssClass="e-outline" floatLabelType="Auto" v-model="valorId" placeholder="Escreva seu id aqui" style="width: 100%;"></ejs-textbox>
-            </div>
-        </div>
+            <div class="row d-flex justify-content-center mt-4">
+                <div class="col-md-12">
+                    <div class="position-relative">
+                        <ejs-textbox
+                            ref="senha"
+                            cssClass="e-outline"
+                            floatLabelType="Auto"
+                            v-model="valorSenha"
+                            placeholder="Escreva sua senha aqui"
+                            :type="mostrarSenha ? 'text' : 'password'"
+                            style="width: 100%;"
+                        ></ejs-textbox>
 
-        <div class="row" style="display: flex; justify-content: center; margin-top: 20px;">
-            <div class="col-md-12">
-                <ejs-textbox ref="senha" cssClass="e-outline" floatLabelType="Auto" v-model="valorSenha" placeholder="Escreva sua senha aqui" type="password" style="width: 100%;"></ejs-textbox>
+                        <!-- Ícone manual -->
+                        <i :class="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'" @click="alternarSenha"
+                            style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666;">
+                        </i>
+                    </div>
+                </div>
             </div>
-        </div>
-    
-        <div class="row" style="margin-top: 20px; display: flex; justify-content: center;">
-            <div class="col-md-6">
-                <ejs-button cssClass="e-primary" @click.native="reqLogin">Fazer login</ejs-button>
+        
+            <div class="row d-flex justify-content-center mt-4">
+                <div class="col-md-6">
+                    <ejs-button cssClass="e-primary" @click.native="reqLogin">Fazer login</ejs-button>
+                </div>
             </div>
-        </div>
     </div>
 </div>
 `;
@@ -33,6 +47,7 @@ Vue.component('AppVue', {
         return {
             valorId: '',
             valorSenha: '',
+            mostrarSenha: false,
         }
     },
 
@@ -41,6 +56,10 @@ Vue.component('AppVue', {
     },
 
     methods: {
+        alternarSenha() {
+            this.mostrarSenha = !this.mostrarSenha;
+        },
+
         showToast(message, type = 'info') {
             let css = 'e-toast-info';
             if (type === 'success') css = 'e-toast-success';

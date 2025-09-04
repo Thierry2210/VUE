@@ -12,7 +12,8 @@ const AppTemplate = /*html*/ `
                     placeholder="Id" 
                     v-model="valorId" 
                     type="text"
-                    cssClass="e-outline">
+                    cssClass="e-outline"
+                    floatLabelType="Auto">
                 </ejs-textbox>
             </div>
 
@@ -22,18 +23,28 @@ const AppTemplate = /*html*/ `
                     placeholder="Nome" 
                     v-model="valorNome" 
                     type="text"
-                    cssClass="e-outline">
+                    cssClass="e-outline"
+                    floatLabelType="Auto">
                 </ejs-textbox>
             </div>
 
             <!-- Senha -->
             <div class="col-md-2">
-                <ejs-textbox 
-                    placeholder="Senha" 
-                    v-model="valorSenha" 
-                    type="password"
-                    cssClass="e-outline">
-                </ejs-textbox>
+                <div class="position-relative">
+                    <ejs-textbox
+                        ref="senha"
+                        cssClass="e-outline"
+                        floatLabelType="Auto"
+                        v-model="valorSenha"
+                         placeholder="Escreva sua senha aqui"
+                        :type="mostrarSenha ? 'text' : 'password'"
+                        style="width: 100%;">
+                    </ejs-textbox>
+                        <!-- Ícone manual -->
+                    <i :class="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'" @click="alternarSenha"
+                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666;">
+                    </i>
+                </div>
             </div>
 
             <!-- Nível -->
@@ -43,7 +54,8 @@ const AppTemplate = /*html*/ `
                     v-model="selecionadoNivel"
                     placeholder="Selecione um nível"
                     :fields="campos"
-                    cssClass="e-outline">
+                    cssClass="e-outline"
+                    floatLabelType="Auto">
                 </ejs-dropdownlist>
             </div>
         </div>
@@ -91,9 +103,7 @@ const AppTemplate = /*html*/ `
 Vue.component('AppVue', {
     template: AppTemplate,
     data() {
-        const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
         return {
-            usuarioNivel: usuario.nivel || 0,
             valorId: null,
             valorNome: "",
             valorSenha: "",
@@ -102,8 +112,9 @@ Vue.component('AppVue', {
             campos: { value: 'id', text: 'texto' },
             dataSource: [],
             isEditing: false,
+            mostrarSenha: false,
             toolbar: [
-                "Search",
+                { text: "Search", prefixIcon: "fas fa-search", id: "search" },
                 { text: "Editar", prefixIcon: "fas fa-edit", id: "editar" },
                 { text: "Excluir", prefixIcon: "fas fa-trash", id: "excluir" }
             ]
@@ -114,6 +125,10 @@ Vue.component('AppVue', {
         this.selectNivelUsuario();
     },
     methods: {
+        alternarSenha() {
+            this.mostrarSenha = !this.mostrarSenha;
+        },
+
         showToast(message, type = 'info') {
             let css = 'e-toast-info';
             if (type === 'success') css = 'e-toast-success';
@@ -203,6 +218,10 @@ Vue.component('AppVue', {
         },
 
         toolbarClick(args) {
+            if (args.item.id === 'search') {
+                return;
+            }
+
             const itemSelecionado = this.getSelectedItem();
             if (!itemSelecionado) return;
 

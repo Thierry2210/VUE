@@ -76,56 +76,59 @@
     <!--========== NAV ==========-->
     <!-- Navbar -->
     <div id="appNav">
-        <div class="nav" id="navbar" style="padding-left: 20px; background-color: #0072BC">
+        <div class="nav" id="navbar" style="padding-left: 20px;">
             <nav class="nav__container">
                 <div>
                     <a href="<?= URL ?>" class="nav__link nav__logo">
-                        <i class='bx bx-home nav__icon' style="color: white;"></i>
-                        <span class="nav__logo-name" style="color: white;">Início</span>
+                        <i class='bx bx-home nav__icon'></i>
+                        <span class="nav__logo-name">Início</span>
                     </a>
 
                     <div class="nav__list">
                         <div class="nav__items">
-                            <h3 class="nav__subtitle" style="color: white;">Perfil</h3>
+                            <h3 class="nav__subtitle">Perfil</h3>
                             <div class="nav__dropdown">
                                 <a href="#" class="nav__link">
-                                    <i class='bx bx-user nav__icon' style="color: white;"></i>
-                                    <span class="nav__name" style="color: white;">Opções do Perfil</span>
-                                    <i class='bx bx-chevron-down nav__icon nav__dropdown-icon' style="color: white;"></i>
+                                    <i class='bx bx-user nav__icon'></i>
+                                    <span class="nav__name">Opções do Perfil</span>
+                                    <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
                                 </a>
 
                                 <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel == 1">
                                     <div class="nav__dropdown-content">
-                                        <a href="<?= URL ?>cadastro" class="nav__dropdown-item" style="color: black;">Cadastro de Usuários</a>
+                                        <i class='bx bx-user-plus' style="color: black"></i>
+                                        <a href="<?= URL ?>cadastro" class="nav__dropdown-item">Cadastro Usuário</a>
                                     </div>
                                 </div>
 
                                 <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel < 3">
                                     <div class="nav__dropdown-content">
-                                        <a href="<?= URL ?>tipolancamento" class="nav__dropdown-item" style="color: black;">Tipos de Lançamentos</a>
+                                        <i class='bx bx-transfer' style="color: black"></i>
+                                        <a href="<?= URL ?>tipolancamento" class="nav__dropdown-item">Tipo Lançamento</a>
                                     </div>
                                 </div>
 
                                 <div class="nav__dropdown-collapse" v-if="!isLogged">
                                     <div class="nav__dropdown-content">
-                                        <a href="<?= URL ?>login" class="nav__dropdown-item" style="color: black;">Login</a>
+                                        <i class='bx bx-log-in' style="color: black"></i>
+                                        <a href="<?= URL ?>login" class="nav__dropdown-item">Login</a>
                                     </div>
                                 </div>
 
                                 <div class="nav__dropdown-collapse" v-if="isLogged">
                                     <div class="nav__dropdown-content">
-                                        <a href="<?= URL ?>lancamento" class="nav__dropdown-item" style="color: black;">Lançamentos</a>
+                                        <i class='bx bx-paper-plane' style="color: black"></i>
+                                        <a href="<?= URL ?>lancamento" class="nav__dropdown-item">Lançamentos</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <a href="#" class="nav__link nav__logout" v-if="isLogged" @click="logout">
-                            <i class='bx bx-log-out nav__icon' style="color: white;"></i>
-                            <span class="nav__name" style="color: white;">Sair</span>
-                        </a>
                     </div>
                 </div>
+                <a href="#" class="nav__link nav__logout" v-if="isLogged" @click="logout">
+                    <i class='bx bx-log-out nav__icon'></i>
+                    <span class="nav__name">Sair</span>
+                </a>
             </nav>
         </div>
     </div>

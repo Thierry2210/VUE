@@ -5,7 +5,7 @@ const AppTemplate = /*html*/ `
 
     <div class="row">
         <!-- Campo sequencia oculto (usado para edição) -->
-        <ejs-textbox ref="sequencia" v-model="valorSequencia" type="hidden" cssClass="e-outline"></ejs-textbox>
+        <ejs-textbox ref="sequencia" v-model="valorSequencia" type="hidden" cssClass="e-outline" floatLabelType="Auto"></ejs-textbox>
 
         <!-- Linha de inputs principais -->
         <div class="row" style="display: flex; justify-content: center;">
@@ -13,6 +13,7 @@ const AppTemplate = /*html*/ `
             <div class="col-md-2">
                 <ejs-datepicker
                     cssClass="e-outline" 
+                    floatLabelType="Auto"
                     ref="data"
                     v-model="valorData" 
                     placeholder="Selecione uma data" 
@@ -24,6 +25,7 @@ const AppTemplate = /*html*/ `
             <div class="col-md-2">
                 <ejs-dropdownlist
                     cssClass="e-outline"
+                    floatLabelType="Auto"
                     :dataSource="opcoesLancamento"
                     v-model="selecionadoLancamento"
                     :fields="campos"
@@ -35,6 +37,7 @@ const AppTemplate = /*html*/ `
             <div class="col-md-2">
                 <ejs-maskedtextbox 
                     cssClass="e-outline"
+                    floatLabelType="Auto"
                     v-model="valor"
                     placeholder="Digite um valor"
                     :format="'n2'"
@@ -46,18 +49,16 @@ const AppTemplate = /*html*/ `
             <div class="col-md-2">
                 <ejs-dropdownlist
                     cssClass="e-outline"
+                    floatLabelType="Auto"
                     :dataSource="opcoesFluxo"
                     v-model="selecionadoFluxo"
                     :fields="campos"
                     placeholder="Selecione um fluxo">
                 </ejs-dropdownlist>
             </div>
-        </div>
-
-        <!-- Observações -->
-        <div class="row" style="margin-top: 20px; justify-content: center;">
+            
             <div class="col-md-4">
-                <ejs-textbox v-model="obs" placeholder="Observações" cssClass="e-outline"></ejs-textbox>
+                <ejs-textbox v-model="obs" placeholder="Observações" cssClass="e-outline" floatLabelType="Auto"></ejs-textbox>
             </div>
         </div>
 
@@ -122,7 +123,7 @@ Vue.component('AppVue', {
             campos: { value: 'id', text: 'texto' }, // mapeamento dropdown
             isEditing: false,               // controle de edição
             toolbar: [
-                "Search",
+                { text: "Search", id: "search" },
                 { text: "Editar", prefixIcon: "fas fa-edit", id: "editar" },
                 { text: "Excluir", prefixIcon: "fas fa-trash", id: "excluir" }
             ]
@@ -238,6 +239,10 @@ Vue.component('AppVue', {
 
         /** Handler do toolbar (editar / excluir) */
         toolbarClick(args) {
+            if (args.item.id === 'search') {
+                return;
+            }
+
             const itemSelecionado = this.getSelectedItem();
             if (!itemSelecionado) return;
 
