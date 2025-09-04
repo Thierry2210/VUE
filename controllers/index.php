@@ -19,4 +19,9 @@ class Index extends Controller
         $this->view->render('header');
         $this->view->render('footer');
     }
+
+    public function movimentacoesAno()
+    {
+        $this->model->movimentacoesAno();
+    }
 }

@@ -14,7 +14,7 @@ class Cadastro_Model extends Model
     public function getRequestData()
     {
         $x = file_get_contents('php://input');
-        $x = json_decode($x, true); // array associativo
+        $x = json_decode($x, true);
         return $x ?? [];
     }
 
@@ -46,70 +46,80 @@ class Cadastro_Model extends Model
     {
         $dados = $this->getRequestData();
 
-        $valorId = $dados['id'] ?? null;
-        $valorNome = $dados['nome'] ?? '';
-        $valorSenha = $dados['senha'] ?? '';
-        $selecionadoNivel = $dados['nivel'] ?? null;
-
-        $result = $this->insert(
-            "fluxocaixa.usuario",
-            [
-                "id"    => $valorId,
-                "nome"  => $valorNome,
-                "senha" => hash('sha256', $valorSenha), // Aplica SHA-256 na senha,
-                "nivel" => $selecionadoNivel,
-            ]
-        );
-
-        if ($result) {
-            $msg = array("codigo" => 1, "texto" => "Registro inserido com sucesso.");
-        } else {
-            $msg = array("codigo" => 0, "texto" => "Erro ao inserir");
+        if (empty($dados['id']) || empty($dados['nome']) || empty($dados['senha'])) {
+            echo json_encode([
+                "codigo" => 0,
+                "texto" => "Dados obrigatórios não informados"
+            ]);
+            return;
         }
 
-        echo json_encode($msg);
+        $senhaHash = hash('sha256', $dados['senha']);
+
+        $result = $this->insert("fluxocaixa.usuario", [
+            "id" => $dados['id'],
+            "nome" => $dados['nome'],
+            "senha" => $senhaHash,
+            "nivel" => $dados['nivel'] ?? 1
+        ]);
+
+        echo json_encode(
+            $result ?
+                ["codigo" => 1, "texto" => "Usuário cadastrado com sucesso"] :
+                ["codigo" => 0, "texto" => "Erro ao cadastrar usuário"]
+        );
     }
 
 
     public function del()
     {
-        $dados = $this->getRequestData();
-        $id = (int)($dados['id'] ?? 0);
+        $id = $this->getRequestData()['id'] ?? null;
 
-        $msg = array("codigo" => 0, "texto" => "Erro ao excluir.");
-
-        if ($id > 0) {
-            $result = $this->delete("fluxocaixa.usuario", "id='$id'");
-            if ($result) {
-                $msg = array("codigo" => 1, "texto" => "Registro exluído com sucesso.");
-            }
+        if (empty($id)) {
+            echo json_encode([
+                "codigo" => 0,
+                "texto" => "ID do usuário não informado"
+            ]);
+            return;
         }
 
-        echo json_encode($msg);
+        $existe = $this->select("SELECT id FROM fluxocaixa.usuario WHERE id = :id", ["id" => $id]);
+
+        if (empty($existe)) {
+            echo json_encode([
+                "codigo" => 0,
+                "texto" => "Usuário não encontrado"
+            ]);
+            return;
+        }
+
+        $result = $this->delete("fluxocaixa.usuario", "id = '$id'");
+
+        echo json_encode(
+            $result ?
+                ["codigo" => 1, "texto" => "Usuário excluído com sucesso"] :
+                ["codigo" => 0, "texto" => "Erro ao excluir usuário"]
+        );
     }
 
     public function loadData()
     {
-        $dados = $this->getRequestData(); // função helper que criamos
-        $id = (int)($dados['id'] ?? 0);
+        $id = $this->getRequestData()['id'] ?? null;
 
-        $result = [];
-
-
-        if ($id > 0) {
-            $result = $this->select(
-                "SELECT 
-                    u.id,
-                    u.nome,
-                    u.senha,
-                    u.nivel
-                FROM 
-                    fluxocaixa.usuario u
-                WHERE 
-                    u.id=:id",
-                ["id" => $id]
-            );
+        if (empty($id)) {
+            echo json_encode([]);
+            return;
         }
+
+        $result = $this->select(
+            "SELECT 
+                id, nome, senha, nivel 
+            FROM 
+                fluxocaixa.usuario 
+            WHERE 
+                id = :id",
+            ["id" => $id]
+        );
 
         echo json_encode($result);
     }
@@ -118,41 +128,42 @@ class Cadastro_Model extends Model
     public function save()
     {
         $dados = $this->getRequestData();
+        $id = $dados['id'] ?? null;
 
-        $valorId = $dados['id'] ?? null;
-        $valorNome = $dados['nome'] ?? '';
-        $valorSenha = $dados['senha'] ?? '';
-        $selecionadoNivel = $dados['nivel'] ?? null;
-
-        $msg = array("codigo" => 0, "texto" => "Erro ao atualizar.");
-
-        if ($valorId > 0) {
-            $dadosSave = array(
-                "nome" => $valorNome,
-                "senha" => $valorSenha,
-                "nivel" => $selecionadoNivel
-            );
-
-            $result = $this->update("fluxocaixa.usuario", $dadosSave, "id='$valorId'");
-
-            if ($result) {
-                $msg = array("codigo" => 1, "texto" => "Registro atualizado com sucesso.");
-            }
+        if (empty($id)) {
+            echo json_encode([
+                "codigo" => 0,
+                "texto" => "ID do usuário não informado"
+            ]);
+            return;
         }
 
-        echo (json_encode($msg));
+        $dadosUpdate = [
+            "nome" => $dados['nome'],
+            "senha" => hash('sha256', $dados['senha']),
+            "nivel" => $dados['nivel']
+        ];
+
+        $result = $this->update("fluxocaixa.usuario", $dadosUpdate, "id = '$id'");
+
+        echo json_encode(
+            $result ?
+                ["codigo" => 1, "texto" => "Usuário atualizado com sucesso"] :
+                ["codigo" => 0, "texto" => "Erro ao atualizar usuário"]
+        );
     }
 
 
     public function selectNivelUsuario()
     {
-        $result = $this->select("
-        select codigo,descricao 
-        from fluxocaixa.nivelusuario 
-        order by descricao");
+        $sql = "SELECT 
+                    codigo,descricao 
+                FROM 
+                    fluxocaixa.nivelusuario 
+                ORDER BY descricao";
 
-        $result = json_encode($result);
+        $result =  $this->select($sql);
 
-        echo ($result);
+        echo json_encode($result);
     }
 }

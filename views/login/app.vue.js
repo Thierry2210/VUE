@@ -75,32 +75,46 @@ Vue.component('AppVue', {
         },
 
         reqLogin() {
-            // Esse método é chamado quando o usuário clica no botão de login.
+            // 🛡️ 1. Validação Frontend (opcional mas recomendada)
+            if (!this.valorId.trim() || !this.valorSenha.trim()) {
+                this.showToast('Por favor, preencha todos os campos', 'warning');
+                return;
+            }
 
-            axios.post(BASE + "/login/autenticar", {
+            // 📤 2. Preparar dados para envio
+            const credenciais = {
                 usuario: this.valorId,
                 senha: this.valorSenha
-            }).then(res => {
-                // Se a requisição deu certo, cai aqui
+            };
 
-                if (res.data.codigo && res.data.codigo === 1) {
+            // 📡 3. Requisição HTTP para backend
+            axios.post(BASE + "/login/autenticar", credenciais)
+                .then(res => {
+                    // 📥 4. Processar resposta do backend
+                    if (res.data.codigo === 1) {
+                        // ✅ Login bem-sucedido
 
-                    this.showToast(res.data.texto, 'success');
-                    // salva no localStorage para o frontend (menu, etc.)
-                    localStorage.setItem('usuario', JSON.stringify(res.data.usuario));
+                        // 💾 5. Salvar dados do usuário no navegador
+                        localStorage.setItem('usuario', JSON.stringify(res.data.usuario));
 
-                    // redireciona para home ou onde quiser
-                    setTimeout(() => {
-                        window.location.href = BASE;
-                    }, 1000);
+                        // 🎉 6. Feedback para usuário
+                        this.showToast("Login realizado com sucesso!", 'success');
 
-                } else {
-                    // Se o backend retornou erro, mostra alerta
-                    this.showToast(res.data.texto, 'error');
-                }
-            })
-                .this.showToast(() => alert("Erro ao conectar.", 'warning'));
-            // Caso a requisição dê erro(servidor fora do ar, rota errada, etc.)
+                        // 🔄 7. Redirecionar para aplicação
+                        setTimeout(() => {
+                            window.location.href = BASE;
+                        }, 1000);
+
+                    } else {
+                        // ❌ Credenciais inválidas
+                        this.showToast(res.data.texto, 'error');
+                    }
+                })
+                .catch(error => {
+                    // 🚨 8. Tratar erros de conexão
+                    console.error('Erro de conexão:', error);
+                    this.showToast("Erro ao conectar com o servidor. Tente novamente.", 'warning');
+                });
         }
     },
 

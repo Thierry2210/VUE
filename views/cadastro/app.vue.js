@@ -180,6 +180,11 @@ Vue.component('AppVue', {
         },
 
         reqLanca() {
+            if (!this.valorId || !this.valorNome || !this.valorSenha || !this.selecionadoNivel) {
+                this.showToast('Preencha todos os campos obrigatórios', 'warning');
+                return;
+            }
+
             this.sendData('/cadastro/addUsuario', this.payload(), res => {
                 this.showToast(res.texto, 'success');
                 this.reqLista();

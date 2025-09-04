@@ -181,7 +181,7 @@ Vue.component('AppVue', {
 
                 axios.post(BASE + "/tipolancamento/del", { id: itemSelecionado.sequencia })
                     .then(res => {
-                        this.showToast(res.texto, 'success');
+                        this.showToast(res.data.texto, 'success');
                         this.reqLista();
                     });
             }

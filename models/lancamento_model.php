@@ -12,11 +12,10 @@ class Lancamento_model extends Model
     public function getRequestData()
     {
         $x = file_get_contents('php://input');
-        $x = json_decode($x, true); // array associativo
+        $x = json_decode($x, true);
         return $x ?? [];
     }
 
-    // Listar todos os lançamentos
     public function listaLancamento()
     {
         $sql = "SELECT 
@@ -44,7 +43,6 @@ class Lancamento_model extends Model
         echo json_encode($msg);
     }
 
-    // Inserir novo lançamento
     public function insertLancamento()
     {
         $dados = $this->getRequestData();
@@ -75,7 +73,6 @@ class Lancamento_model extends Model
         echo (json_encode($msg));
     }
 
-    // Excluir lançamento
     public function del()
     {
         $dados = $this->getRequestData();
@@ -93,7 +90,6 @@ class Lancamento_model extends Model
         echo json_encode($msg);
     }
 
-    // Carregar um lançamento por ID
     public function loadData()
     {
         $dados = $this->getRequestData();
@@ -121,17 +117,16 @@ class Lancamento_model extends Model
         echo json_encode($result);
     }
 
-    // Atualizar lançamento
     public function save()
     {
         $dados = $this->getRequestData();
 
-        $valorSequencia = $dados['valorSequencia'] ?? null;
-        $valorData = $dados['valorData'] ?? null;
-        $selecionadoLancamento = $dados['selecionadoLancamento'] ?? null;
+        $valorSequencia = $dados['sequencia'] ?? null;
+        $valorData = $dados['data'] ?? null;
+        $selecionadoLancamento = $dados['lancamento'] ?? null;
         $valor = $dados['valor'] ?? 0;
-        $selecionadoFluxo = $dados['selecionadoFluxo'] ?? null;
-        $obs = $dados['obs'] ?? "";
+        $selecionadoFluxo = $dados['fluxo'] ?? null;
+        $obs = $dados['obs'] ?? '';
 
         $msg = array("codigo" => 0, "texto" => "Erro ao atualizar.");
 

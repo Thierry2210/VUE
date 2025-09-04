@@ -41,7 +41,8 @@ const AppTemplate = /*html*/ `
                     v-model="valor"
                     placeholder="Digite um valor"
                     :format="'n2'"
-                    :decimals="2">
+                    :decimals="2"
+                    @keypress.native="somenteNumero">
                 </ejs-maskedtextbox>
             </div>
 
@@ -147,6 +148,13 @@ Vue.component('AppVue', {
                 timeOut: 3000, // 3 segundos
                 showCloseButton: true
             });
+        },
+
+        somenteNumero(event) {
+            const tecla = event.key;
+            if (!/[0-9.,]/.test(tecla)) {
+                event.preventDefault();
+            }
         },
 
         /** Reset de formulário */

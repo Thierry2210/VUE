@@ -12,16 +12,24 @@ class Login_model extends Model
     public function getRequestData()
     {
         $x = file_get_contents('php://input');
-        $x = json_decode($x, true); // array associativo
+        $x = json_decode($x, true);
         return $x ?? [];
     }
 
     public function autenticar($usuario, $senha)
     {
-        $sql = "SELECT id, nome, senha, nivel FROM fluxocaixa.usuario WHERE id = :id";
-        $dados = $this->select($sql, [':id' => $usuario]);
+        $sql = "SELECT 
+                    id, nome, senha, nivel 
+                FROM 
+                    fluxocaixa.usuario 
+                WHERE 
+                    id = :id";
 
-        if ($dados && hash('sha256', (string)$senha) === $dados[0]['senha']) {
+        $sth = $this->db->prepare($sql);
+        $sth->execute([':id' => $usuario]);
+        $dados = $sth->fetch(PDO::FETCH_ASSOC);
+
+        if ($dados && hash('sha256', (string)$senha) === $dados['senha']) {
             unset($dados[0]['senha']);
             return [
                 'codigo' => 1,
@@ -29,7 +37,10 @@ class Login_model extends Model
                 'usuario' => $dados
             ];
         } else {
-            return ['codigo' => 0, 'texto' => 'Usuário ou senha inválidos'];
+            return [
+                'codigo' => 0,
+                'texto' => 'Usuário ou senha inválidos'
+            ];
         }
     }
 }

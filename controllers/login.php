@@ -15,11 +15,7 @@ class Login extends Controller
         $this->view->title = "Login de Usuário";
         array_push($this->view->js, "views/login/app.vue.js");
         array_push($this->view->css, "views/login/app.vue.css");
-
-        // Renderiza header
         $this->view->render('header');
-
-        // Renderiza footer
         $this->view->render('footer');
     }
 
@@ -31,9 +27,12 @@ class Login extends Controller
 
         $res = $this->model->autenticar($usuario, $senha);
 
-        if ($res['codigo'] === 1 && session_status() == PHP_SESSION_NONE) {
-            session_start();
-            $_SESSION['usuario'] = $res['usuario']; // guarda na sessão do servidor
+        if ($res['codigo'] === 1) {
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            $_SESSION['usuario'] = $res['usuario'];
         }
 
         echo json_encode($res);
@@ -42,12 +41,14 @@ class Login extends Controller
 
     public function logout()
     {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+        if (session_status() == PHP_SESSION_NONE) session_start();
         session_destroy();
 
-        echo json_encode(['codigo' => 1, 'texto' => 'Logout efetuado']);
+        echo json_encode([
+            'codigo' => 1,
+            'texto' => 'Logout efetuado'
+        ]);
+
         header("Location: " . URL . "login");
         exit;
     }
