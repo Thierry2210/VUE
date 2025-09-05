@@ -67,7 +67,7 @@ const AppTemplate = /*html*/ `
         <div class="row" style="margin-top: 20px; justify-content: center;">
             <div class="col-md-4" style="display: flex; justify-content: center; gap: 20px;">
                 <div v-if="!isEditing">
-                    <ejs-button cssClass="e-info" @click.native="reqLanca">Cadastrar</ejs-button>
+                    <ejs-button cssClass="e-info" @click.native="reqLanca">Lançar</ejs-button>
                 </div>
                 <div v-else>
                     <ejs-button cssClass="e-success" @click.native="reqSave">Salvar</ejs-button>
@@ -78,7 +78,7 @@ const AppTemplate = /*html*/ `
 
         <!-- Grid -->
         <div class="row" style="margin-top: 20px;">
-            <div class="col-md-12">
+            <div class="col-md-12" >
                 <ejs-grid 
                     ref="grid"
                     :dataSource="dataSource"
@@ -88,7 +88,8 @@ const AppTemplate = /*html*/ `
                     :toolbar="toolbar"
                     :toolbarClick="toolbarClick"
                     :pageSettings="{ pageSizes: true, pageSize: 12 }"
-                    :searchSettings="{ ignoreCase: true, ignoreAccent: true }">
+                    :searchSettings="{ ignoreCase: true, ignoreAccent: true }"
+                    >
 
                     <e-columns>
                         <e-column field="sequencia" headerText="Sequência"></e-column>
@@ -111,31 +112,32 @@ Vue.component('AppVue', {
     // No seu caso, o template vem da constante AppTemplate que você criou antes.
 
     data() {
+        const usuario = JSON.parse(localStorage.getItem('usuario')) || null;
+
         return {
+            usuario: usuario,
             valorSequencia: null,           // campo ligado ao input da sequencia(v - model="valorId")
             valorData: null,                // campo ligado ao input da data(v - model="valorId")
             selecionadoLancamento: null,    // campo ligado ao select do tipo de lancamento(v - model="valorId")
             selecionadoFluxo: null,         // campo ligado ao select do tipo de fluxo(v - model="valorId")
-            valor: null,                       // campo ligado ao input do valor(v - model="valorId")
+            valor: null,                    // campo ligado ao input do valor(v - model="valorId")
             obs: "",                        // campo ligado ao input da observação(v - model="valorId")
             dataSource: [],                 // dados do grid
             opcoesLancamento: [],           // dropdown Lançamento
             opcoesFluxo: [],                // dropdown Fluxo
             campos: { value: 'id', text: 'texto' }, // mapeamento dropdown
             isEditing: false,               // controle de edição
-            toolbar: [
-                { text: "Search", id: "search" },
-                { text: "Editar", prefixIcon: "fas fa-edit", id: "editar" },
-                { text: "Excluir", prefixIcon: "fas fa-trash", id: "excluir" }
-            ]
+            toolbar: []
         };
     },
     mounted() {
         // Ao montar o componente, carregamos dados e selects
         this.reqLista();
         this.carregarDropdowns();
+        this.configurarToolbar();
     },
     methods: {
+        /** Exibe mensagens estilizads na tela */
         showToast(message, type = 'info') {
             let css = 'e-toast-info';
             if (type === 'success') css = 'e-toast-success';
@@ -150,10 +152,25 @@ Vue.component('AppVue', {
             });
         },
 
-        somenteNumero(event) {
-            const tecla = event.key;
+        /** Configuração da toolbar */
+        configurarToolbar() {
+            let baseToolbar = [{ text: "Search", id: "search" }];
+
+            if (this.usuario && this.usuario.nivel <= 2) {
+                baseToolbar.push(
+                    { text: "Editar", prefixIcon: "fas fa-edit", id: "editar" },
+                    { text: "Excluir", prefixIcon: "fas fa-trash", id: "excluir" }
+                )
+            }
+
+            this.toolbar = baseToolbar;
+        },
+
+        /** Permite apenas números no input */
+        somenteNumero(num) {
+            const tecla = num.key;
             if (!/[0-9.,]/.test(tecla)) {
-                event.preventDefault();
+                num.preventDefault();
             }
         },
 
@@ -203,6 +220,11 @@ Vue.component('AppVue', {
 
         /** Cadastra novo lançamento */
         reqLanca() {
+            if (!this.valorData || !this.selecionadoLancamento || !this.valor || !this.selecionadoFluxo) {
+                this.showToast('Preencha todos os campos obrigatórios', 'warning');
+                return;
+            }
+
             this.sendData('/lancamento/addLancamento', this.payload(), res => {
                 this.showToast(res.texto, 'success');
                 this.reqLista();

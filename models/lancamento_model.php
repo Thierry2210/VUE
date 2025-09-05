@@ -23,13 +23,13 @@ class Lancamento_model extends Model
                     DATE_FORMAT(l.data, '%d/%m/%Y') AS data,
                     l.valor,
                     l.obs,
-                    T.descricao as fluxo,
-                    T2.descricao as tipo
+                    t.descricao as fluxo,
+                    t2.descricao as tipo
                 FROM 
                     fluxocaixa.lancamento l,
                     fluxocaixa.tipofluxo t,
                     fluxocaixa.tipolancamento t2
-                where
+                WHERE
                     L.fluxo = T.codigo
                     and L.tipo = T2.sequencia 
                 ORDER BY sequencia";
@@ -46,6 +46,14 @@ class Lancamento_model extends Model
     public function insertLancamento()
     {
         $dados = $this->getRequestData();
+
+        if (empty($dados['data']) || empty($dados['lancamento']) || empty($dados['valor']) || empty($dados['fluxo'])) {
+            echo json_encode([
+                "codigo" => 0,
+                "texto" => "Dados obrigatórios não informados"
+            ]);
+            return;
+        }
 
         $valorData = $dados['data'] ?? null;
         $selecionadoLancamento = $dados['lancamento'] ?? null;
@@ -84,6 +92,8 @@ class Lancamento_model extends Model
             $result = $this->delete("fluxocaixa.lancamento", "sequencia='$id'");
             if ($result) {
                 $msg = array("codigo" => 1, "texto" => "Registro exluído com sucesso.");
+            } else {
+                $msg = array("codigo" => 0, "texto" => "Erro ao exluir");
             }
         }
 
@@ -143,6 +153,8 @@ class Lancamento_model extends Model
 
             if ($result) {
                 $msg = array("codigo" => 1, "texto" => "Registro atualizado com sucesso.");
+            } else {
+                $msg = array("codigo" => 0, "texto" => "Erro ao atualziar registro");
             }
         }
 

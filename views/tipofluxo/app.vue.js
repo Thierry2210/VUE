@@ -1,64 +1,33 @@
 const AppTemplate = /*html*/ `
+
 <div class="control-section" style="margin-top: 5%">
-
+    <!-- Toast -->
     <ejs-toast ref="toast" :position="{ X: 'Center', Y: 'Top' }"></ejs-toast>
-
+    
     <div class="row">
-        <!-- Linha de inputs principais -->
-        <div class="row" style="display: flex; justify-content: center; gap: 10px;">
             <!-- ID-->
             <div class="col-md-2">
                 <ejs-textbox 
-                    placeholder="Id" 
-                    v-model="valorId" 
-                    type="text"
+                    placeholder="Tipo Lancamento" 
+                    v-model="valorCodigo" 
+                    type="hidden"
                     cssClass="e-outline"
                     floatLabelType="Auto">
                 </ejs-textbox>
             </div>
-
-            <!-- Nome -->
-            <div class="col-md-3">
+        <!-- Linha de inputs principais -->
+        <div class="row" style="display: flex; justify-content: center; gap: 10px;">
+            
+            <!-- descricao -->
+            <div class="col-md-4">
                 <ejs-textbox 
-                    placeholder="Nome" 
-                    v-model="valorNome" 
+                    placeholder="Descrição" 
+                    v-model="valorDescricao" 
                     type="text"
                     cssClass="e-outline"
                     floatLabelType="Auto">
                 </ejs-textbox>
             </div>
-
-            <!-- Senha -->
-            <div class="col-md-2">
-                <div class="position-relative">
-                    <ejs-textbox
-                        ref="senha"
-                        cssClass="e-outline"
-                        floatLabelType="Auto"
-                        v-model="valorSenha"
-                         placeholder="Escreva sua senha aqui"
-                        :type="mostrarSenha ? 'text' : 'password'"
-                        style="width: 100%;">
-                    </ejs-textbox>
-                        <!-- Ícone manual -->
-                    <i :class="mostrarSenha ? 'bx bx-show' : 'bx bx-hide'" @click="alternarSenha"
-                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666;">
-                    </i>
-                </div>
-            </div>
-
-            <!-- Nível -->
-            <div class="col-md-2">
-                <ejs-dropdownlist
-                    :dataSource="opcoesNivel"
-                    v-model="selecionadoNivel"
-                    placeholder="Selecione um nível"
-                    :fields="campos"
-                    cssClass="e-outline"
-                    floatLabelType="Auto">
-                </ejs-dropdownlist>
-            </div>
-        </div>
 
         <!-- Botões -->
         <div class="row" style="margin-top: 20px; justify-content: center;">
@@ -88,10 +57,8 @@ const AppTemplate = /*html*/ `
                     :searchSettings="{ ignoreCase: true, ignoreAccent: true }">
 
                     <e-columns>
-                        <e-column field="id" headerText="ID"></e-column>
-                        <e-column field="nome" headerText="Nome"></e-column>
-                        <e-column field="senha" headerText="Senha"></e-column>
-                        <e-column field="nivel" headerText="Nível"></e-column>
+                        <e-column field="codigo" headerText="Código"></e-column>
+                        <e-column field="descricao" headerText="Descrição"></e-column>
                     </e-columns>
                 </ejs-grid>
             </div>
@@ -104,17 +71,12 @@ Vue.component('AppVue', {
     template: AppTemplate,
     data() {
         return {
-            valorId: null,
-            valorNome: "",
-            valorSenha: "",
-            selecionadoNivel: null,
-            opcoesNivel: [],
-            campos: { value: 'id', text: 'texto' },
+            valorCodigo: null,
+            valorDescricao: "",
             dataSource: [],
             isEditing: false,
-            mostrarSenha: false,
             toolbar: [
-                { text: "Search", prefixIcon: "fas fa-search", id: "search" },
+                { text: "Search", id: "search" },
                 { text: "Editar", prefixIcon: "fas fa-edit", id: "editar" },
                 { text: "Excluir", prefixIcon: "fas fa-trash", id: "excluir" }
             ]
@@ -122,13 +84,8 @@ Vue.component('AppVue', {
     },
     mounted() {
         this.reqLista();
-        this.selectNivelUsuario();
     },
     methods: {
-        alternarSenha() {
-            this.mostrarSenha = !this.mostrarSenha;
-        },
-
         showToast(message, type = 'info') {
             let css = 'e-toast-info';
             if (type === 'success') css = 'e-toast-success';
@@ -144,19 +101,15 @@ Vue.component('AppVue', {
         },
 
         resetForm() {
-            this.valorId = null;
-            this.valorNome = "";
-            this.valorSenha = "";
-            this.selecionadoNivel = null;
+            this.valorCodigo = null;
+            this.valorDescricao = "";
             this.isEditing = false;
         },
 
         payload() {
             return {
-                id: this.valorId,
-                nome: this.valorNome,
-                senha: this.valorSenha,
-                nivel: this.selecionadoNivel
+                codigo: this.valorCodigo,
+                descricao: this.valorDescricao,
             };
         },
 
@@ -166,33 +119,28 @@ Vue.component('AppVue', {
                     if (res.data.codigo === 1) {
                         successCallback && successCallback(res.data);
                     } else {
-                        this.showToast(res.data.texto || 'Erro desconhecido', 'error');
+                        this.showToast(res.data.texto, 'error');
                     }
                 })
-                .catch(() => this.showToast('Erro ao conectar com o servidor.', 'error'));
+                .catch(() => this.showToast("Por favor, selecione um registro", 'warning'));
         },
 
         reqLista() {
-            this.sendData('/cadastro/listaUsuario', {}, res => {
+            this.sendData('/tipofluxo/listaTipoFluxo', {}, res => {
                 this.dataSource = res.dados;
                 this.resetForm();
             });
         },
 
         reqLanca() {
-            if (!this.valorId || !this.valorNome || !this.valorSenha || !this.selecionadoNivel) {
-                this.showToast('Preencha todos os campos obrigatórios', 'warning');
-                return;
-            }
-
-            this.sendData('/cadastro/addUsuario', this.payload(), res => {
+            this.sendData('/tipofluxo/addTipoFluxo', this.payload(), res => {
                 this.showToast(res.texto, 'success');
                 this.reqLista();
             });
         },
 
         reqSave() {
-            this.sendData('/cadastro/save', this.payload(), res => {
+            this.sendData('/tipofluxo/save', this.payload(), res => {
                 this.showToast(res.texto, 'success');
                 this.reqLista();
             });
@@ -202,21 +150,11 @@ Vue.component('AppVue', {
             this.resetForm();
         },
 
-        selectNivelUsuario() {
-            axios.post(BASE + "/cadastro/selectNivelUsuario")
-                .then(res => {
-                    this.opcoesNivel = res.data.map(item => ({
-                        id: item.codigo,
-                        texto: item.descricao
-                    }));
-                })
-                .catch(() => mainLayout.sToast('Erro ao carregar níveis', 'error'));
-        },
-
+        /** Retorna primeiro item selecionado do grid */
         getSelectedItem() {
             const items = this.$refs.grid.getSelectedRecords();
             if (!items.length) {
-                this.showToast('Por favor, selecione um usuário.', 'warning');
+                this.showToast('Por favor, selecione um registro.', 'warning');
                 return null;
             }
             return items[0];
@@ -231,19 +169,17 @@ Vue.component('AppVue', {
             if (!itemSelecionado) return;
 
             if (args.item.id === 'editar') {
-                axios.post(BASE + "/cadastro/loadData", { id: itemSelecionado.id })
+                axios.post(BASE + "/tipofluxo/loadData", { id: itemSelecionado.codigo })
                     .then(res => {
                         const d = res.data[0];
-                        this.valorId = d.id;
-                        this.valorNome = d.nome;
-                        this.valorSenha = d.senha;
-                        this.selecionadoNivel = d.nivel;
+                        this.valorCodigo = d.codigo;
+                        this.valorDescricao = d.descricao;
                         this.isEditing = true;
                     });
             } else if (args.item.id === 'excluir') {
                 if (!confirm("Tem certeza que deseja excluir esse item?")) return;
 
-                axios.post(BASE + "/cadastro/del", { id: itemSelecionado.id })
+                axios.post(BASE + "/tipofluxo/del", { id: itemSelecionado.codigo })
                     .then(res => {
                         this.showToast(res.data.texto, 'success');
                         this.reqLista();

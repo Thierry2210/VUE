@@ -44,23 +44,6 @@ const AppTemplate = /* html */ `
             </e-series-collection>
         </ejs-chart>
         <br>
-        <ejs-button
-        ref="toggleBtn"
-        cssClass="e-flat"
-        :isPrimary="true"
-        :isToggle="true"
-        v-on:click.native="btnClickGraph"
-        :contentGraph="contentValue"
-        >Página do Gráfico</ejs-button>
-
-        <ejs-button
-        ref="toggleBtn"
-        cssClass="e-flat"
-        :isPrimary="true"
-        :isToggle="true"
-        v-on:click.native="btnClick"
-        :content="contentValue"
-        >Página de Dashboard</ejs-button>
     </div>
 </div>
 
@@ -96,8 +79,6 @@ Vue.component('AppVue', {
       marker: { visible: true, height: 10, width: 10 },
       tooltip: { enable: true },
       title: "Resumo financeiro a cada 3 anos",
-      contentGraph: "Página do Gráfico",
-      content: "Página do Dashboard"
     };
   },
 
@@ -122,22 +103,22 @@ Vue.component('AppVue', {
         if (res.data.codigo === 1) {
           this.seriesEntrada = res.data.dados.map(item => {
             return {
-              x: new Date(parseInt(item.ano), 0, 1), // ano -> Date (janeiro do ano)
-              y: parseFloat(item.entrada)           // entrada -> número
+              x: new Date(parseInt(item.ano), 0, 1),
+              y: parseFloat(item.entrada)
             };
           });
 
           this.seriesSaida = res.data.dados.map(item => {
             return {
-              x: new Date(parseInt(item.ano), 0, 1), // ano -> Date (janeiro do ano)
-              y: parseFloat(item.saida)           // entrada -> número
+              x: new Date(parseInt(item.ano), 0, 1),
+              y: parseFloat(item.saida)
             };
           });
 
           this.seriesLucro = res.data.dados.map(item => {
             return {
-              x: new Date(parseInt(item.ano), 0, 1), // ano -> Date (janeiro do ano)
-              y: parseFloat(item.lucro)           // entrada -> número
+              x: new Date(parseInt(item.ano), 0, 1),
+              y: parseFloat(item.lucro)
             };
           });
 

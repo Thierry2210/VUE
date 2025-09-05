@@ -54,6 +54,25 @@ class Cadastro_Model extends Model
             return;
         }
 
+        $sql = "SELECT
+                    COUNT(U.ID) AS total
+                FROM
+                    FLUXOCAIXA.USUARIO U
+                WHERE
+                    U.ID = :ID";
+
+        $result = $this->select($sql, ["ID" => $dados["id"]]);
+
+        $jaExiste = $result[0]['total'] ?? 0;
+
+        if ($jaExiste > 0) {
+            echo json_encode([
+                "codigo" => 0,
+                "texto" => "ID já cadastrado"
+            ]);
+            return;
+        }
+
         $senhaHash = hash('sha256', $dados['senha']);
 
         $result = $this->insert("fluxocaixa.usuario", [

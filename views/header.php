@@ -79,7 +79,7 @@
         <div class="nav" id="navbar" style="padding-left: 20px;">
             <nav class="nav__container">
                 <div>
-                    <a href="<?= URL ?>" class="nav__link nav__logo">
+                    <a href="<?= URL ?>" class="nav__link nav__logo" v-if="isLogged">
                         <i class='bx bx-home nav__icon'></i>
                         <span class="nav__logo-name">Início</span>
                     </a>
@@ -101,10 +101,24 @@
                                     </div>
                                 </div>
 
-                                <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel < 3">
+                                <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel <= 2">
                                     <div class="nav__dropdown-content">
                                         <i class='bx bx-transfer' style="color: black"></i>
                                         <a href="<?= URL ?>tipolancamento" class="nav__dropdown-item">Tipo Lançamento</a>
+                                    </div>
+                                </div>
+
+                                <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel <= 2">
+                                    <div class="nav__dropdown-content">
+                                        <i class='bx bx-refresh' style="color: black"></i>
+                                        <a href="<?= URL ?>tipofluxo" class="nav__dropdown-item">Tipo Fluxo</a>
+                                    </div>
+                                </div>
+
+                                <div class="nav__dropdown-collapse" v-if="isLogged && usuario.nivel == 1">
+                                    <div class="nav__dropdown-content">
+                                        <i class='bx bx-pyramid' style="color: black"></i>
+                                        <a href="<?= URL ?>nivel" class="nav__dropdown-item">Nível Usuário</a>
                                     </div>
                                 </div>
 
@@ -121,6 +135,34 @@
                                         <a href="<?= URL ?>lancamento" class="nav__dropdown-item">Lançamentos</a>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="nav__items" v-if="isLogged">
+                                <h3 class="nav__subtitle">Menu</h3>
+
+                                <div class="nav__dropdown">
+                                    <a href="#" class="nav__link">
+                                        <i class='bx bx-bell nav__icon'></i>
+                                        <span class="nav__name">Notificações</span>
+                                        <i class='bx bx-chevron-down nav__icon nav__dropdown-icon'></i>
+                                    </a>
+
+                                    <div class="nav__dropdown-collapse">
+                                        <div class="nav__dropdown-content">
+                                            <a href="#" class="nav__dropdown-item">InfoHub</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <a href="#" class="nav__link">
+                                    <i class='bx bx-compass nav__icon'></i>
+                                    <span class="nav__name">Explorar</span>
+                                </a>
+                                <a href="#" class="nav__link">
+                                    <i class='bx bx-bookmark nav__icon'></i>
+                                    <span class="nav__name">Salvos</span>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -141,28 +183,25 @@
         const usuario = JSON.parse(localStorage.getItem('usuario')) || null;
 
         new Vue({
-            el: '#appNav', // Este é o ID do contêiner de navegação
+            el: '#appNav',
             data: {
-                isLogged: !!usuario, // Checa se o usuário está logado
+                isLogged: !!usuario,
                 usuario: usuario
             },
             methods: {
                 logout() {
                     localStorage.removeItem("usuario");
-                    this.usuario = null; // Remove o usuário do localStorage
-                    this.isLogged = false; // Atualiza o estado do Vue
-                    // Redireciona para a página de login
+                    this.usuario = null;
+                    this.isLogged = false;
                     window.location.href = BASE + "/login";
                 }
             }
         });
 
         const mainLayout = new Vue({
-            el: '#mainLayout', // Este é o ID do contêiner do layout principal
-            data: {
-                // Qualquer outra informação necessária para o layout principal
-            },
-            template: `<AppVue></AppVue>`, // Carrega o componente VueApp
+            el: '#mainLayout',
+            data: {},
+            template: `<AppVue></AppVue>`,
         });
     </script>
 

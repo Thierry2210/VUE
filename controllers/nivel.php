@@ -1,0 +1,47 @@
+<?php
+
+class Nivel extends Controller
+{
+
+    function __construct()
+    {
+        parent::__construct();
+        $this->view->js = array();
+        $this->view->css = array();
+    }
+
+    function index()
+    {
+        $this->view->title = "Home";
+        /*Os array push devem ser feitos antes de instanciar o header e footer.*/
+        array_push($this->view->js, "views/nivel/app.vue.js");
+        array_push($this->view->css, "views/nivel/app.vue.css");
+        $this->view->render('header');
+        $this->view->render('footer');
+    }
+
+    function addNivelUsuario()
+    {
+        $this->model->insertNivelUsuario();
+    }
+
+    function listaNivel()
+    {
+        $this->model->listaNivel();
+    }
+
+    function del()
+    {
+        $this->model->del();
+    }
+
+    function loadData()
+    {
+        $this->model->loadData();
+    }
+
+    function save()
+    {
+        $this->model->save();
+    }
+}
