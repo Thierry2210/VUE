@@ -16,7 +16,7 @@ class Index_model extends Model
                     SUM(CASE WHEN l.fluxo = 1 THEN l.valor ELSE 0 END) AS entrada,
                     SUM(CASE WHEN l.fluxo = 2 THEN l.valor ELSE 0 END) AS saida,
                     SUM(CASE WHEN l.fluxo = 1 THEN l.valor ELSE 0 END) - 
-                    SUM(CASE WHEN l.fluxo = 2 THEN l.valor ELSE 0 END) AS lucro
+                    SUM(CASE WHEN l.fluxo = 2 THEN l.valor ELSE 0 END) AS resultado
                 FROM 
                     fluxocaixa.lancamento l
                 WHERE 

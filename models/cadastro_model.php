@@ -79,7 +79,7 @@ class Cadastro_Model extends Model
             "id" => $dados['id'],
             "nome" => $dados['nome'],
             "senha" => $senhaHash,
-            "nivel" => $dados['nivel'] ?? 1
+            "nivel" => $dados['nivel'] ?? 3
         ]);
 
         echo json_encode(

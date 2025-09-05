@@ -33,11 +33,11 @@ const AppTemplate = /* html */ `
                 :marker="marker"
                 ></e-series>
                 <e-series
-                :dataSource="seriesLucro"
+                :dataSource="seriesResultado"
                 type="Line"
                 xName="x"
                 yName="y"
-                name="Lucro"
+                name="Resultado"
                 width=3
                 :marker="marker"
                 ></e-series>
@@ -55,7 +55,7 @@ Vue.component('AppVue', {
     return {
       seriesEntrada: [],
       seriesSaida: [],
-      seriesLucro: [],
+      seriesResultado: [],
       primaryXAxis: {
         valueType: "DateTime",
         labelFormat: "y",
@@ -115,10 +115,10 @@ Vue.component('AppVue', {
             };
           });
 
-          this.seriesLucro = res.data.dados.map(item => {
+          this.seriesResultado = res.data.dados.map(item => {
             return {
               x: new Date(parseInt(item.ano), 0, 1),
-              y: parseFloat(item.lucro)
+              y: parseFloat(item.resultado)
             };
           });
 

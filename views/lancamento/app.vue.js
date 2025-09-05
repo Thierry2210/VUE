@@ -16,7 +16,7 @@ const AppTemplate = /*html*/ `
                     floatLabelType="Auto"
                     ref="data"
                     v-model="valorData" 
-                    placeholder="Selecione uma data" 
+                    placeholder="Selecione uma data *" 
                     format="yyyy-MM-dd">
                 </ejs-datepicker>
             </div>
@@ -29,7 +29,8 @@ const AppTemplate = /*html*/ `
                     :dataSource="opcoesLancamento"
                     v-model="selecionadoLancamento"
                     :fields="campos"
-                    placeholder="Selecione um lançamento">
+                    placeholder="Selecione um lançamento *
+                    ">
                 </ejs-dropdownlist>
             </div>
 
@@ -39,7 +40,7 @@ const AppTemplate = /*html*/ `
                     cssClass="e-outline"
                     floatLabelType="Auto"
                     v-model="valor"
-                    placeholder="Digite um valor"
+                    placeholder="Digite um valor *"
                     :format="'n2'"
                     :decimals="2"
                     @keypress.native="somenteNumero">
@@ -54,7 +55,7 @@ const AppTemplate = /*html*/ `
                     :dataSource="opcoesFluxo"
                     v-model="selecionadoFluxo"
                     :fields="campos"
-                    placeholder="Selecione um fluxo">
+                    placeholder="Selecione um fluxo *">
                 </ejs-dropdownlist>
             </div>
             

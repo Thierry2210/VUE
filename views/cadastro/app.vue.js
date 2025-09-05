@@ -9,7 +9,7 @@ const AppTemplate = /*html*/ `
             <!-- ID-->
             <div class="col-md-2">
                 <ejs-textbox 
-                    placeholder="Id" 
+                    placeholder="Id *" 
                     v-model="valorId" 
                     type="text"
                     cssClass="e-outline"
@@ -20,7 +20,7 @@ const AppTemplate = /*html*/ `
             <!-- Nome -->
             <div class="col-md-3">
                 <ejs-textbox 
-                    placeholder="Nome" 
+                    placeholder="Nome *" 
                     v-model="valorNome" 
                     type="text"
                     cssClass="e-outline"
@@ -36,7 +36,7 @@ const AppTemplate = /*html*/ `
                         cssClass="e-outline"
                         floatLabelType="Auto"
                         v-model="valorSenha"
-                         placeholder="Escreva sua senha aqui"
+                         placeholder="Escreva a senha aqui *"
                         :type="mostrarSenha ? 'text' : 'password'"
                         style="width: 100%;">
                     </ejs-textbox>
@@ -52,7 +52,7 @@ const AppTemplate = /*html*/ `
                 <ejs-dropdownlist
                     :dataSource="opcoesNivel"
                     v-model="selecionadoNivel"
-                    placeholder="Selecione um nível"
+                    placeholder="Selecione um nível *"
                     :fields="campos"
                     cssClass="e-outline"
                     floatLabelType="Auto">

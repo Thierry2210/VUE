@@ -6,7 +6,7 @@ const AppTemplate = /*html*/`
         <div style="width: 300px;">
             <div class="row d-flex justify-content-center mt-4">
                 <div class="col-md-12">
-                    <ejs-textbox ref="texto" cssClass="e-outline" floatLabelType="Auto" v-model="valorId" placeholder="Escreva seu id aqui" style="width: 100%;"></ejs-textbox>
+                    <ejs-textbox ref="texto" cssClass="e-outline" floatLabelType="Auto" v-model="valorId" placeholder="Escreva seu id aqui *" style="width: 100%;"></ejs-textbox>
                 </div>
             </div>
 
@@ -18,7 +18,7 @@ const AppTemplate = /*html*/`
                             cssClass="e-outline"
                             floatLabelType="Auto"
                             v-model="valorSenha"
-                            placeholder="Escreva sua senha aqui"
+                            placeholder="Escreva sua senha aqui *"
                             :type="mostrarSenha ? 'text' : 'password'"
                             style="width: 100%;"
                         ></ejs-textbox>
